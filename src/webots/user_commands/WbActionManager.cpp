@@ -762,9 +762,9 @@ void WbActionManager::populateActions() {
   action->setToolTip(action->statusTip());
   action->setIcon(icon);
 #ifdef __APPLE__
-  action->setShortcut(Qt::META + Qt::ALT + Qt::Key_5);
+  action->setShortcut(Qt::META + Qt::ALT + Qt::Key_7);
 #else
-  action->setShortcut(Qt::ALT + Qt::Key_5);
+  action->setShortcut(Qt::ALT + Qt::Key_7);
 #endif
   mActions[MOVE_VIEWPOINT_TO_OBJECT] = action;
 
@@ -798,9 +798,9 @@ void WbActionManager::populateActions() {
   action->setToolTip(action->statusTip());
   action->setIcon(icon);
 #ifdef __APPLE__
-  action->setShortcut(Qt::META + Qt::ALT + Qt::Key_2);
+  action->setShortcut(Qt::META + Qt::ALT + Qt::Key_1);
 #else
-  action->setShortcut(Qt::ALT + Qt::Key_2);
+  action->setShortcut(Qt::ALT + Qt::Key_1);
 #endif
   mActions[FRONT_VIEW] = action;
 
@@ -813,9 +813,9 @@ void WbActionManager::populateActions() {
   action->setToolTip(action->statusTip());
   action->setIcon(icon);
 #ifdef __APPLE__
-  action->setShortcut(Qt::META + Qt::ALT + Qt::Key_8);
+  action->setShortcut(Qt::META + Qt::ALT + Qt::Key_2);
 #else
-  action->setShortcut(Qt::ALT + Qt::Key_8);
+  action->setShortcut(Qt::ALT + Qt::Key_2);
 #endif
   mActions[BACK_VIEW] = action;
 
@@ -828,9 +828,9 @@ void WbActionManager::populateActions() {
   action->setToolTip(action->statusTip());
   action->setIcon(icon);
 #ifdef __APPLE__
-  action->setShortcut(Qt::META + Qt::ALT + Qt::Key_4);
+  action->setShortcut(Qt::META + Qt::ALT + Qt::Key_3);
 #else
-  action->setShortcut(Qt::ALT + Qt::Key_4);
+  action->setShortcut(Qt::ALT + Qt::Key_3);
 #endif
   mActions[LEFT_VIEW] = action;
 
@@ -843,9 +843,9 @@ void WbActionManager::populateActions() {
   action->setToolTip(action->statusTip());
   action->setIcon(icon);
 #ifdef __APPLE__
-  action->setShortcut(Qt::META + Qt::ALT + Qt::Key_6);
+  action->setShortcut(Qt::META + Qt::ALT + Qt::Key_4);
 #else
-  action->setShortcut(Qt::ALT + Qt::Key_6);
+  action->setShortcut(Qt::ALT + Qt::Key_4);
 #endif
   mActions[RIGHT_VIEW] = action;
 
@@ -858,9 +858,9 @@ void WbActionManager::populateActions() {
   action->setToolTip(action->statusTip());
   action->setIcon(icon);
 #ifdef __APPLE__
-  action->setShortcut(Qt::META + Qt::ALT + Qt::Key_1);
+  action->setShortcut(Qt::META + Qt::ALT + Qt::Key_5);
 #else
-  action->setShortcut(Qt::ALT + Qt::Key_1);
+  action->setShortcut(Qt::ALT + Qt::Key_5);
 #endif
   mActions[TOP_VIEW] = action;
 
@@ -873,9 +873,9 @@ void WbActionManager::populateActions() {
   action->setToolTip(action->statusTip());
   action->setIcon(icon);
 #ifdef __APPLE__
-  action->setShortcut(Qt::META + Qt::ALT + Qt::Key_7);
+  action->setShortcut(Qt::META + Qt::ALT + Qt::Key_6);
 #else
-  action->setShortcut(Qt::ALT + Qt::Key_7);
+  action->setShortcut(Qt::ALT + Qt::Key_6);
 #endif
   mActions[BOTTOM_VIEW] = action;
 
