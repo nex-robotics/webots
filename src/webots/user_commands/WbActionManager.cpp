@@ -15,6 +15,7 @@
 #include "WbActionManager.hpp"
 
 #include "WbSimulationState.hpp"
+#include "../app/WbSelection.hpp"
 #include "WbUndoStack.hpp"
 
 #ifdef __linux__
@@ -1122,4 +1123,23 @@ void WbActionManager::setActionEnabledSilently(QAction *action, bool enabled) {
   action->blockSignals(true);
   action->setEnabled(enabled);
   action->blockSignals(false);
+}
+
+void WbActionManager::updateViewNames() {
+  const WbBaseNode *selectedNode = WbSelection::instance() ? WbSelection::instance()->selectedNode() : NULL;
+  if (selectedNode) {
+    mActions[FRONT_VIEW]->setText(tr("Front View"));
+    mActions[BACK_VIEW]->setText(tr("Back View"));
+    mActions[LEFT_VIEW]->setText(tr("Left View"));
+    mActions[RIGHT_VIEW]->setText(tr("Right View"));
+    mActions[TOP_VIEW]->setText(tr("Top View"));
+    mActions[BOTTOM_VIEW]->setText(tr("Bottom View"));
+  } else {
+    mActions[FRONT_VIEW]->setText(tr("West View"));
+    mActions[BACK_VIEW]->setText(tr("East View"));
+    mActions[LEFT_VIEW]->setText(tr("South View"));
+    mActions[RIGHT_VIEW]->setText(tr("North View"));
+    mActions[TOP_VIEW]->setText(tr("Up View"));
+    mActions[BOTTOM_VIEW]->setText(tr("Down View"));
+  }
 }

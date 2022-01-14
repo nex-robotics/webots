@@ -148,8 +148,6 @@ private slots:
   void updateUploadProgressBar(qint64 bytesSent, qint64 bytesTotal);
   void uploadFinished();
 
-  void updateViewNames();
-
 private:
   void showHtmlRobotWindow(WbRobot *);
   int mExitStatus;

@@ -557,8 +557,7 @@ QMenu *WbMainWindow::createViewMenu() {
   subMenu->addAction(actionManager->action(WbAction::RIGHT_VIEW));
   subMenu->addAction(actionManager->action(WbAction::TOP_VIEW));
   subMenu->addAction(actionManager->action(WbAction::BOTTOM_VIEW));
-  connect(actionManager->action(WbAction::VIEW_MENU), &QAction::hovered, this, &WbMainWindow::updateViewNames);
-
+  QObject::connect(subMenu, &QMenu::aboutToShow, WbActionManager::instance(), &WbActionManager::updateViewNames);
   menu->addSeparator();
 
   mToggleFullScreenAction = new QAction(this);
@@ -2457,28 +2456,5 @@ void WbMainWindow::finalizeNodeRegeneration(WbNode *node) {
       }
     }
     mTemporaryProtoPerspectives.clear();
-  }
-}
-
-void WbMainWindow::updateViewNames() {
-  const WbBaseNode *selectedNode = WbSelection::instance() ? WbSelection::instance()->selectedNode() : NULL;
-
-  WbActionManager *actionManager = WbActionManager::instance();
-  if (selectedNode) {
-    printf("isNode\n");
-    actionManager->action(WbAction::FRONT_VIEW)->setText(tr("Front View"));
-    actionManager->action(WbAction::BACK_VIEW)->setText(tr("Back View"));
-    actionManager->action(WbAction::LEFT_VIEW)->setText(tr("Left View"));
-    actionManager->action(WbAction::RIGHT_VIEW)->setText(tr("Right View"));
-    actionManager->action(WbAction::TOP_VIEW)->setText(tr("Top View"));
-    actionManager->action(WbAction::BOTTOM_VIEW)->setText(tr("Bottom View"));
-  } else {
-    printf("isNot\n");
-    actionManager->action(WbAction::FRONT_VIEW)->setText(tr("West View"));
-    actionManager->action(WbAction::BACK_VIEW)->setText(tr("East View"));
-    actionManager->action(WbAction::LEFT_VIEW)->setText(tr("South View"));
-    actionManager->action(WbAction::RIGHT_VIEW)->setText(tr("North View"));
-    actionManager->action(WbAction::TOP_VIEW)->setText(tr("Up View"));
-    actionManager->action(WbAction::BOTTOM_VIEW)->setText(tr("Down View"));
   }
 }

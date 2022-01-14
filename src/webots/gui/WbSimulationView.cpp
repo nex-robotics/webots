@@ -197,7 +197,7 @@ QToolBar *WbSimulationView::createToolBar() {
   viewMenu->addAction(manager->action(WbAction::TOP_VIEW));
   viewMenu->addAction(manager->action(WbAction::BOTTOM_VIEW));
   viewMenuButton->setMenu(viewMenu);
-  connect(viewMenuButton, &QToolButton::pressed, this, &WbSimulationView::updateViewNames);
+  QObject::connect(viewMenu, &QMenu::aboutToShow, WbActionManager::instance(), &WbActionManager::updateViewNames);
 
   mToolBar->addSeparator();
 
@@ -1108,27 +1108,4 @@ void WbSimulationView::showEvent(QShowEvent *event) {
 void WbSimulationView::showMenu(const QPoint &position) {
   const WbBaseNode *selectedNode = WbSelection::instance() ? WbSelection::instance()->selectedNode() : NULL;
   WbContextMenuGenerator::generateContextMenu(position, selectedNode);
-}
-
-void WbSimulationView::updateViewNames() {
-  const WbBaseNode *selectedNode = WbSelection::instance() ? WbSelection::instance()->selectedNode() : NULL;
-
-  WbActionManager *actionManager = WbActionManager::instance();
-  if (selectedNode) {
-    printf("isNode\n");
-    actionManager->action(WbAction::FRONT_VIEW)->setText(tr("Front View"));
-    actionManager->action(WbAction::BACK_VIEW)->setText(tr("Back View"));
-    actionManager->action(WbAction::LEFT_VIEW)->setText(tr("Left View"));
-    actionManager->action(WbAction::RIGHT_VIEW)->setText(tr("Right View"));
-    actionManager->action(WbAction::TOP_VIEW)->setText(tr("Top View"));
-    actionManager->action(WbAction::BOTTOM_VIEW)->setText(tr("Bottom View"));
-  } else {
-    printf("isNot\n");
-    actionManager->action(WbAction::FRONT_VIEW)->setText(tr("West View"));
-    actionManager->action(WbAction::BACK_VIEW)->setText(tr("East View"));
-    actionManager->action(WbAction::LEFT_VIEW)->setText(tr("South View"));
-    actionManager->action(WbAction::RIGHT_VIEW)->setText(tr("North View"));
-    actionManager->action(WbAction::TOP_VIEW)->setText(tr("Up View"));
-    actionManager->action(WbAction::BOTTOM_VIEW)->setText(tr("Down View"));
-  }
 }
