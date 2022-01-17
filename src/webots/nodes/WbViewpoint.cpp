@@ -1274,11 +1274,9 @@ void WbViewpoint::frontView() {
   WbBaseNode *selectedNode = WbSelection::instance() ? WbSelection::instance()->selectedNode() : NULL;
   WbAbstractTransform *at = dynamic_cast<WbAbstractTransform *>(selectedNode);
 
-  if (at){
-    //WbRotation r = at->rotation();
-    WbRotation rw = WbRotation(r.x(), r.y(), r.z(), - M_PI + r.angle());
-    //WbQuaternion tot = WbRotation(0, 0, 1, -M_PI).toQuaternion() * at->rotation().toQuaternion();
-    orbitTo(at->xAxis(), rw);
+  if (at) {
+    WbQuaternion q = at->rotation().toQuaternion() * WbRotation(0, 0, 1, M_PI).toQuaternion();
+    orbitTo(at->xAxis(), WbRotation(q));
   } else
     orbitTo(WbVector3(1, 0, 0), WbRotation(0, 0, 1, -M_PI));
 }
@@ -1287,28 +1285,55 @@ void WbViewpoint::backView() {
   WbBaseNode *selectedNode = WbSelection::instance() ? WbSelection::instance()->selectedNode() : NULL;
   WbAbstractTransform *at = dynamic_cast<WbAbstractTransform *>(selectedNode);
 
-  if (at)
-    orbitTo(- at->xAxis(), at->rotation());
-  else
+  if (at) {
+    WbQuaternion q = at->rotation().toQuaternion() * WbRotation(0, 0, 1, 0).toQuaternion();
+    orbitTo(-at->xAxis(), WbRotation(q));
+  } else
     orbitTo(WbVector3(-1, 0, 0), WbRotation(0, 0, 1, 0));
 }
 
 void WbViewpoint::leftView() {
-  // orbitTo(WbVector3(-1, 0, 0), WbRotation(0, 0, 1, 0));
-  orbitTo(WbVector3(0, 1, 0), WbRotation(0, 0, 1, -M_PI_2));
+  WbBaseNode *selectedNode = WbSelection::instance() ? WbSelection::instance()->selectedNode() : NULL;
+  WbAbstractTransform *at = dynamic_cast<WbAbstractTransform *>(selectedNode);
+
+  if (at) {
+    WbQuaternion q = at->rotation().toQuaternion() * WbRotation(0, 0, 1, 3 * M_PI / 2).toQuaternion();
+    orbitTo(at->yAxis(), WbRotation(q));
+  } else
+    orbitTo(WbVector3(0, 1, 0), WbRotation(0, 0, 1, -M_PI_2));
 }
 
 void WbViewpoint::rightView() {
-  // orbitTo(WbVector3(1, 0, 0), WbRotation(0, 0, 1, -M_PI));
-  orbitTo(WbVector3(0, -1, 0), WbRotation(0, 0, 1, M_PI_2));
+  WbBaseNode *selectedNode = WbSelection::instance() ? WbSelection::instance()->selectedNode() : NULL;
+  WbAbstractTransform *at = dynamic_cast<WbAbstractTransform *>(selectedNode);
+
+  if (at) {
+    WbQuaternion q = at->rotation().toQuaternion() * WbRotation(0, 0, 1, M_PI_2).toQuaternion();
+    orbitTo(-at->yAxis(), WbRotation(q));
+  } else
+    orbitTo(WbVector3(0, -1, 0), WbRotation(0, 0, 1, M_PI_2));
 }
 
 void WbViewpoint::topView() {
-  orbitTo(WbVector3(0, 0, 1), WbRotation(-0.5773, 0.5773, 0.5773, 2.0944));
+  WbBaseNode *selectedNode = WbSelection::instance() ? WbSelection::instance()->selectedNode() : NULL;
+  WbAbstractTransform *at = dynamic_cast<WbAbstractTransform *>(selectedNode);
+
+  if (at) {
+    WbQuaternion q = at->rotation().toQuaternion() * WbRotation(0, 1, 0, M_PI_2).toQuaternion();
+    orbitTo(at->zAxis(), WbRotation(q));
+  } else
+    orbitTo(WbVector3(0, 0, 1), WbRotation(-0.5773, 0.5773, 0.5773, 2.0944));
 }
 
 void WbViewpoint::bottomView() {
-  orbitTo(WbVector3(0, 0, -1), WbRotation(0.5773, 0.5773, 0.5773, -2.0944));
+  WbBaseNode *selectedNode = WbSelection::instance() ? WbSelection::instance()->selectedNode() : NULL;
+  WbAbstractTransform *at = dynamic_cast<WbAbstractTransform *>(selectedNode);
+
+  if (at) {
+    WbQuaternion q = at->rotation().toQuaternion() * WbRotation(0, 1, 0, -M_PI_2).toQuaternion();
+    orbitTo(-at->zAxis(), WbRotation(q));
+  } else
+    orbitTo(WbVector3(0, 0, -1), WbRotation(0.5773, 0.5773, 0.5773, -2.0944));
 }
 
 void WbViewpoint::orbitTo(const WbVector3 &targetUnitVector, const WbRotation &targetRotation) {
