@@ -138,6 +138,7 @@ private:
   QString mDocumentationUrl;
   QStringList mTags;
   QString mTemplateLanguage;
+  QMap<QString, QString> mExternProto;
 
   ~WbProtoModel();  // called from unref()
   void verifyAliasing(WbNode *root, WbTokenizer *tokenizer) const;

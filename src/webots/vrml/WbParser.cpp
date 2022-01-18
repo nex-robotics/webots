@@ -80,6 +80,25 @@ void WbParser::parseString() {
     reportUnexpected(QObject::tr("string literal"));
 }
 
+const QString WbParser::parseUrl() {
+  if (!peekToken()->isString())
+    reportUnexpected(QObject::tr("string literal"));
+
+  const QString url = nextToken()->toString();
+  printf(" > url: %s\n", url.toUtf8().constData());
+  if (!(url.toLower().startsWith("webots://") || url.toLower().startsWith("https://"))) {
+    mTokenizer->reportError(QObject::tr("Expected url starting with 'webots://' or 'https://'"));
+    throw 0;
+  }
+
+  if (!url.toLower().endsWith(".proto")) {
+    mTokenizer->reportError(QObject::tr("Expected url to end with '.proto' or '.PROTO'"));
+    throw 0;
+  }
+
+  return url;
+}
+
 void WbParser::parseSingleFieldValue(WbFieldType type, const QString &worldPath) {
   switch (type) {
     case WB_SF_INT32:
@@ -180,6 +199,7 @@ void WbParser::reportUnexpected(const QString &expected) const {
 }
 
 bool WbParser::parseWorld(const QString &worldPath) {
+  printf("parseWorld\n");
   mTokenizer->rewind();
   mMode = WBT;
   try {
@@ -197,6 +217,7 @@ bool WbParser::parseWorld(const QString &worldPath) {
 bool WbParser::parseVrml(const QString &worldPath) {
   mTokenizer->rewind();
   mMode = VRML;
+  printf("parseVrml\n");
   try {
     while (mTokenizer->hasMoreTokens() && !peekToken()->isEof())
       // proto statements can appear in between node statements
@@ -217,6 +238,7 @@ bool WbParser::parseVrml(const QString &worldPath) {
 }
 
 void WbParser::parseProtoDefinition(const QString &worldPath) {
+  printf("parseProtoDefinition\n");
   parseProtoInterface(worldPath);
 
   parseExactWord("{");
@@ -225,6 +247,7 @@ void WbParser::parseProtoDefinition(const QString &worldPath) {
 }
 
 bool WbParser::parseObject(const QString &worldPath) {
+  printf("parseObject");
   mTokenizer->rewind();
   mMode = WBO;
   try {
@@ -297,6 +320,8 @@ void WbParser::parseExactWord(const QString &word) {
 }
 
 void WbParser::parseNode(const QString &worldPath) {
+  printf("parseNode %s\n", peekWord().toUtf8().constData());
+
   if (peekWord() == "USE") {
     skipToken();
     parseIdentifier();
@@ -330,7 +355,7 @@ void WbParser::parseNode(const QString &worldPath) {
     }
     return;
   }
-
+  printf(" > is proto\n");
   const WbProtoModel *const protoModel = WbProtoList::current()->findModel(nodeName, worldPath);
   if (protoModel) {
     parseExactWord("{");
@@ -418,6 +443,8 @@ void WbParser::parseParameter(const WbProtoModel *protoModel, const QString &wor
 
 bool WbParser::parseProtoInterface(const QString &worldPath) {
   mMode = PROTO;
+
+  printf("proto interface\n");
   try {
     parseExactWord("PROTO");
     parseIdentifier();
@@ -435,6 +462,7 @@ bool WbParser::parseProtoInterface(const QString &worldPath) {
 }
 
 bool WbParser::parseProtoBody(const QString &worldPath) {
+  printf("parseProtoBody\n");
   mMode = PROTO;
   try {
     parseNode(worldPath);
@@ -442,6 +470,24 @@ bool WbParser::parseProtoBody(const QString &worldPath) {
   } catch (...) {
     return false;
   }
+  return true;
+}
+
+bool WbParser::parseExternProto(const QString &worldPath) {
+  printf(" > parseExternProto\n");
+  // mMode = PROTO; // needed?
+
+  try {
+    parseExactWord("EXTERNPROTO");
+    const QString identifier = parseIdentifier();
+    const QString url = parseUrl();
+    // printf(" >> found: %s %s\n", identifier.toUtf8().constData(), url.toUtf8().constData());
+    mTokenizer->insertExternProtoReference(identifier, url);
+  } catch (...) {
+    printf(" >> failure\n");
+    return false;
+  }
+
   return true;
 }
 

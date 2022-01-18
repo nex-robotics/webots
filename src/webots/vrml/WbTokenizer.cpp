@@ -45,6 +45,7 @@ WbTokenizer::WbTokenizer() :
 }
 
 WbTokenizer::~WbTokenizer() {
+  mExternProto.clear();
   qDeleteAll(mVector);
 }
 
@@ -118,7 +119,7 @@ bool WbTokenizer::readFileInfo(bool headerRequired, bool displayWarning, QString
     }
   }
 
-  // this step can be removed when Lua support is dropped, but is necessary for two different tokens to cohexist as tokenizer
+  // this step can be removed when Lua support is dropped, but is necessary for two different tokens to coexist as tokenizer
   // functions like ReadWord need to adapt the tokens to the context.
   if (isProto) {
     bool isLua = true;
@@ -410,6 +411,10 @@ int WbTokenizer::tokenize(const QString &fileName) {
   if (!checkFileHeader())
     return 1;
 
+  // if world or proto file, map references
+  // if (mFileType == WORLD || mFileType == PROTO)
+  //  extractExternProtoReferences();
+
   int errors = 0;
   try {
     mChar = readChar();
@@ -645,4 +650,14 @@ void WbTokenizer::skipField(bool deleteTokens) {
     mVector.remove(startPos, mIndex - startPos);
     mIndex = startPos;
   }
+}
+
+void WbTokenizer::insertExternProtoReference(QString nodeName, QString url) {
+  // if within the same tokenizer context (i.e same world, same proto, or same wbo) the same identifier points to
+  // different urls, only the last one is considered standing
+  if (!mExternProto.contains(nodeName))
+    mExternProto.insert(nodeName, url);
+  else
+    mExternProto[nodeName] = url;  // overwrite
+  // TODO: print warning if already exists?
 }

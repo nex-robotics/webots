@@ -101,6 +101,7 @@ void WbSingleTaskApplication::convertProto() const {
   // Parse PROTO
   new WbProtoList(QFileInfo(inputFile).absoluteDir().path());
   WbNode::setInstantiateMode(false);
+  printf("convert proto\n");
   WbProtoModel *model = WbProtoList::current()->readModel(inputFile, "");
   if (!toStdout)
     cout << tr("Parsing the %1 PROTO...").arg(model->name()).toUtf8().constData() << endl;

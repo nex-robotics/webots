@@ -49,6 +49,7 @@ public:
 
   bool parseProtoInterface(const QString &worldPath);  // parse PROTO interface in original file
   bool parseProtoBody(const QString &worldPath);       // parse resulting PROTO after template generation
+  bool parseExternProto(const QString &worldPath);     // parse EXTERNPROTO references
 
   // skip PROTO definition in the specified tokenizer
   // this is useful to skip in file PROTO definition for VRML import
@@ -73,6 +74,7 @@ private:
   void parseNode(const QString &worldPath);
   void parseExactWord(const QString &word);
   const QString &parseIdentifier(const QString &expected = "identifier");
+  const QString parseUrl();
   void parseEof();
   void parseFieldDeclaration(const QString &worldPath);
   void parseFieldAcceptedValues(WbFieldType type, const QString &worldPath);

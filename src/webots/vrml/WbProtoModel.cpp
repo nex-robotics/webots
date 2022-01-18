@@ -43,6 +43,8 @@ WbProtoModel::WbProtoModel(WbTokenizer *tokenizer, const QString &worldPath, con
   // nodes in proto parameters or proto body should not be instantiated
   assert(!WbNode::instantiateMode());
 
+  printf("WbProtoModel()\n");
+
   mDerived = false;
   QString baseTypeSlotType;
 
@@ -65,6 +67,20 @@ WbProtoModel::WbProtoModel(WbTokenizer *tokenizer, const QString &worldPath, con
   mDocumentationUrl = tokenizer->documentationUrl();
   mTemplateLanguage = tokenizer->templateLanguage();
   mIsDeterministic = !mTags.contains("nonDeterministic");
+
+  // consume tokens until "PROTO" is found, typically entails skipping EXTERNPROTO references (which are known already)
+  mExternProto = tokenizer->externProto();
+  QMapIterator<QString, QString> i(mExternProto);
+  QString mm = fileName.mid(fileName.lastIndexOf("/"));
+  printf("PROTO %s references:\n", mm.toUtf8().constData());
+  while (i.hasNext()) {
+    i.next();
+    printf("  - %s : %s\n", i.key().toUtf8().constData(), i.value().toUtf8().constData());
+  }
+
+  while (tokenizer->hasMoreTokens() && tokenizer->peekWord() != "PROTO")
+    tokenizer->nextToken();
+
   tokenizer->skipToken("PROTO");
   mName = tokenizer->nextWord();
   // check recursive definition
@@ -186,7 +202,7 @@ WbProtoModel::WbProtoModel(WbTokenizer *tokenizer, const QString &worldPath, con
     file.close();
   }
 
-  // read the remainings tokens in order to
+  // read the remaining tokens in order to
   // - determine if it's a template
   // - check which parameter need to regenerate the template instance
   mTemplate = false;

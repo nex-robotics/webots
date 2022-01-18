@@ -132,7 +132,12 @@ WbProtoModel *WbProtoList::readModel(const QString &fileName, const QString &wor
   if (errors > 0)
     return NULL;
 
+  printf("readmodel (next word is %s)\n", tokenizer.peekWord().toUtf8().constData());
   WbParser parser(&tokenizer);
+
+  if (tokenizer.peekWord() == "EXTERNPROTO")
+    parser.parseExternProto(worldPath);
+
   if (!parser.parseProtoInterface(worldPath))
     return NULL;
 
@@ -172,7 +177,7 @@ WbProtoModel *WbProtoList::findModel(const QString &modelName, const QString &wo
 
   QFileInfoList availableProtoFiles;
   availableProtoFiles << mPrimaryProtoCache << gExtraProtoCache << gProjectsProtoCache << gResourcesProtoCache;
-
+  printf("find model\n");
   foreach (const QFileInfo &fi, availableProtoFiles) {
     if (fi.baseName() == modelName) {
       WbProtoModel *model = readModel(fi.absoluteFilePath(), worldPath, baseTypeList);
