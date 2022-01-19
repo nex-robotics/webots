@@ -84,7 +84,6 @@ void WbDownloader::download(const QUrl &url) {
       return;
     }
   }
-
   if (!gDownloading) {
     gDownloading = true;
     gTimer = new QTimer(0);

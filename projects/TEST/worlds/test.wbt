@@ -1,6 +1,6 @@
 #VRML_SIM R2022b utf8
 
-#EXTERNPROTO ExternProto "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/TEST/protos/ExternProto.proto"
+EXTERNPROTO ExternProto "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/TEST/protos/ExternProto.proto"
 
 WorldInfo {
 }
@@ -11,7 +11,7 @@ Background {
     0.15 0.45 1
   ]
 }
-#ExternProto {
-#}
-ProtoWithExternReference {
+ExternProto {
 }
+#ProtoWithExternReference {
+#}

@@ -46,6 +46,7 @@ WbProtoModel::WbProtoModel(WbTokenizer *tokenizer, const QString &worldPath, con
   assert(!WbNode::instantiateMode());
 
   printf("WbProtoModel()\n");
+  mDownloader = NULL;
 
   mDerived = false;
   QString baseTypeSlotType;
@@ -356,6 +357,7 @@ WbProtoModel::~WbProtoModel() {
 }
 
 WbNode *WbProtoModel::generateRoot(const QVector<WbField *> &parameters, const QString &worldPath, int uniqueId) {
+  printf("WbProtoModel::generateRoot\n");
   if (mContent.isEmpty())
     return NULL;
 

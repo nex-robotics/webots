@@ -283,7 +283,7 @@ WbNode *WbConcreteNodeFactory::createNode(const QString &modelName, WbTokenizer 
     return new WbZoom(tokenizer);
 
   // look for PROTOs
-  printf("Concrete node factor\n");
+  printf("Concrete node factory \n");
   WbProtoModel *const model =
     protoFilePath ?
       WbProtoList::current()->readModel(*protoFilePath, WbWorld::instance() ? WbWorld::instance()->fileName() : "") :

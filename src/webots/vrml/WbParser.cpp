@@ -204,7 +204,7 @@ bool WbParser::parseWorld(const QString &worldPath) {
   mMode = WBT;
   try {
     while (!peekToken()->isEof()) {
-      if (peekWord() == "EXTERNPROTO")
+      while (peekWord() == "EXTERNPROTO")  // consume all EXTERNPROTO tokens
         parseExternProto(worldPath);
 
       parseNode(worldPath);
@@ -484,11 +484,12 @@ void WbParser::parseExternProto(const QString &worldPath) {
   printf(" > parseExternProto\n");
   // note: mMode should not be set as it might be a PROTO or a world
 
-  parseExactWord("EXTERNPROTO");
+  mTokenizer->skipToken("EXTERNPROTO");
   const QString identifier = parseIdentifier();
   const QString url = parseUrl();
+
   // printf(" >> found: %s %s\n", identifier.toUtf8().constData(), url.toUtf8().constData());
-  mTokenizer->insertExternProtoReference(identifier, url);
+  // mTokenizer->insertExternProtoReference(identifier, url);
 }
 
 void WbParser::skipProtoDefinition(WbTokenizer *tokenizer) {
