@@ -358,6 +358,7 @@ QT_SOURCES += \
   WbOdeContext.cpp \
   WbOpenSampleWorldDialog.cpp \
   WbPaintTexture.cpp \
+  WbParser.cpp \
   WbPbrAppearance.cpp \
   WbPen.cpp \
   WbPhysics.cpp \
@@ -526,7 +527,6 @@ OTHER_SOURCES = \
   WbObjectDetection.cpp \
   WbOdeDebugger.cpp \
   WbOdeUtilities.cpp \
-  WbParser.cpp \
   WbPerformanceLog.cpp \
   WbPerspective.cpp \
   WbPicoTextToSpeech.cpp \

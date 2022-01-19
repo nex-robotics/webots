@@ -66,6 +66,20 @@ QIODevice *WbDownloader::device() const {
   return dynamic_cast<QIODevice *>(mNetworkReply);
 }
 
+void WbDownloader::download(const QUrl &url, const QString destination) {
+  WbSimulationState::instance()->pauseSimulation();
+
+  mUrl = url;
+  mDestination = destination;
+
+  QNetworkRequest request;
+  request.setUrl(url);
+
+  mNetworkReply = WbNetwork::instance()->networkAccessManager()->get(request);
+  connect(mNetworkReply, &QNetworkReply::finished, this, &WbDownloader::finished_tmp, Qt::UniqueConnection);
+  connect(WbApplication::instance(), &WbApplication::worldLoadingWasCanceled, mNetworkReply, &QNetworkReply::abort);
+}
+
 void WbDownloader::download(const QUrl &url) {
   WbSimulationState::instance()->pauseSimulation();
 
@@ -106,6 +120,20 @@ void WbDownloader::download(const QUrl &url) {
   connect(WbApplication::instance(), &WbApplication::worldLoadingWasCanceled, mNetworkReply, &QNetworkReply::abort);
 
   gUrlCache.insert(url, mNetworkReply);
+}
+
+void WbDownloader::finished_tmp() {
+  assert(mDestination.size() > 0);
+
+  if (mNetworkReply->error())
+    mError = tr("Cannot download %1: %2").arg(mUrl.toString()).arg(mNetworkReply->errorString());
+
+  printf("HERE %s\n", mDestination.toUtf8().constData());
+  QFile file(mDestination);
+  if (!file.open(QIODevice::WriteOnly))
+    printf("Couldn't write externproto to disk.\n");  // TODO: mError ...
+
+  file.write(mNetworkReply->readAll());
 }
 
 void WbDownloader::finished() {

@@ -14,6 +14,10 @@
 
 #include "WbParser.hpp"
 
+//#include "../core/WbNetwork.hpp"
+#include "../core/WbStandardPaths.hpp"
+#include "../nodes/utils/WbDownloader.hpp"
+
 #include "WbApplicationInfo.hpp"
 #include "WbFieldModel.hpp"
 #include "WbLog.hpp"
@@ -24,6 +28,11 @@
 #include "WbToken.hpp"
 #include "WbTokenizer.hpp"
 
+#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
+
+//#include <QtNetwork/QNetworkReply>
+
 #include <cassert>
 
 static double cLegacyGravity = 9.81;
@@ -32,7 +41,7 @@ double WbParser::legacyGravity() {
   return cLegacyGravity;
 }
 
-WbParser::WbParser(WbTokenizer *tokenizer) : mTokenizer(tokenizer), mMode(NONE) {
+WbParser::WbParser(WbTokenizer *tokenizer) : mTokenizer(tokenizer), mMode(NONE), mDownloader(NULL) {
 }
 
 const QString &WbParser::fileName() const {
@@ -40,6 +49,8 @@ const QString &WbParser::fileName() const {
 }
 
 WbParser::~WbParser() {
+  delete mDownloader;
+  mDownloader = NULL;
 }
 
 void WbParser::parseDoubles(int n) {
@@ -480,6 +491,14 @@ bool WbParser::parseProtoBody(const QString &worldPath) {
   return true;
 }
 
+void WbParser::skipProtoDefinition(WbTokenizer *tokenizer) {
+  // we should skip instead of parsing the tokens
+  // but this is used only for VRML import, and can be optimized later
+  WbParser parser(tokenizer);
+  parser.mMode = PROTO;
+  parser.parseProtoDefinition("");
+}
+
 void WbParser::parseExternProto(const QString &worldPath) {
   printf(" > parseExternProto\n");
   // note: mMode should not be set as it might be a PROTO or a world
@@ -488,14 +507,56 @@ void WbParser::parseExternProto(const QString &worldPath) {
   const QString identifier = parseIdentifier();
   const QString url = parseUrl();
 
+  QString path = WbStandardPaths::webotsTmpPath() + "protos/" + identifier + "/" + identifier + ".proto";
+  QFileInfo file(path);
+  printf("> will download to: %s\n", path.toUtf8().constData());
+
+  if (!file.exists()) {
+    QDir dir;
+    dir.mkpath(file.absolutePath());
+    printf("> created path: %s\n", file.absolutePath().toUtf8().constData());
+
+    if (mDownloader != NULL && mDownloader->device() != NULL)
+      delete mDownloader;
+    mDownloader = new WbDownloader(this);
+    mDownloader->download(QUrl(url), file.filePath());
+    /*
+    QNetworkRequest request;
+    request.setUrl(QUrl(url));
+    QNetworkReply *reply = WbNetwork::instance()->networkAccessManager()->get(request);
+    connect(reply, &QNetworkReply::finished, this, &WbParser::downloadReplyFinished, Qt::UniqueConnection);
+    */
+
+    // recursively retrieve other externs
+  }
+
+  // QFile::copy(file.absoluteFilePath(), WbStandardPaths::webotsTmpPath() + file.fileName());
+
   // printf(" >> found: %s %s\n", identifier.toUtf8().constData(), url.toUtf8().constData());
-  // mTokenizer->insertExternProtoReference(identifier, url);
+  // mTokenizer->insertExternProtoReference(identifier, url);)
 }
 
-void WbParser::skipProtoDefinition(WbTokenizer *tokenizer) {
-  // we should skip instead of parsing the tokens
-  // but this is used only for VRML import, and can be optimized later
-  WbParser parser(tokenizer);
-  parser.mMode = PROTO;
-  parser.parseProtoDefinition("");
+/*
+void WbParser::downloadFinished() {
+  QNetworkReply *reply = dynamic_cast<QNetworkReply *>(sender());
+  assert(reply);
+  if (!reply)
+    return;
+
+  disconnect(reply, &QNetworkReply::finished, this, &WbParser::downloadFinished);
+
+  if (reply->error()) {
+    mError = tr("Error while downloading extern proto: \"%1\"").arg(reply->errorString());
+    reply->deleteLater();
+    return;
+  }
+
+  QString out = WbStandardPaths::webotsTmpPath() + "matest.proto";
+
+  QFile file(out);
+  file.open(QIODevice::WriteOnly);
+  file.write(reply->readAll());
+
+  reply->deleteLater();
 }
+*/
