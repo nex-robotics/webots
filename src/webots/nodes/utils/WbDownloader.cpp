@@ -72,7 +72,8 @@ void WbDownloader::download(const QUrl &url) {
   mUrl = url;
 
   if (gUrlCache.contains(mUrl) && !mIsBackground &&
-      (mUrl.toString().endsWith(".png", Qt::CaseInsensitive) || url.toString().endsWith(".jpg", Qt::CaseInsensitive))) {
+      (mUrl.toString().endsWith(".png", Qt::CaseInsensitive) || url.toString().endsWith(".jpg", Qt::CaseInsensitive) ||
+       url.toString().endsWith(".proto", Qt::CaseInsensitive))) {
     if (!(mOffline == true && mCopy == false)) {
       mCopy = true;
       QNetworkReply *reply = gUrlCache[mUrl];

@@ -70,13 +70,9 @@ public:
   // prerequisite: the syntax must have been checked with WbParser
   void readModel(WbTokenizer *tokenizer, const QString &worldPath);
 
-  void downloadExternProto(QString &url);
-
 private:
   // cppcheck-suppress unknownMacro
   Q_DISABLE_COPY(WbProtoList)
-
-  WbDownloader *mDownloader;
 
   QString mPrimarySearchPath;
   QList<WbProtoModel *> mModels;

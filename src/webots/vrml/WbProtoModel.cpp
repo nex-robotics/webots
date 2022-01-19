@@ -14,6 +14,8 @@
 
 #include "WbProtoModel.hpp"
 
+#include "../nodes/utils/WbDownloader.hpp"
+#include "../nodes/utils/WbUrl.hpp"
 #include "WbField.hpp"
 #include "WbFieldModel.hpp"
 #include "WbLog.hpp"
@@ -69,13 +71,19 @@ WbProtoModel::WbProtoModel(WbTokenizer *tokenizer, const QString &worldPath, con
   mIsDeterministic = !mTags.contains("nonDeterministic");
 
   // consume tokens until "PROTO" is found, typically entails skipping EXTERNPROTO references (which are known already)
+  WbParser parser(tokenizer);
+
+  if (tokenizer->peekWord() == "EXTERNPROTO")
+    parser.parseExternProto(worldPath);
+
   mExternProto = tokenizer->externProto();
   QMapIterator<QString, QString> i(mExternProto);
   QString mm = fileName.mid(fileName.lastIndexOf("/"));
-  printf("PROTO %s references:\n", mm.toUtf8().constData());
+  printf("\nPROTO %s references:\n", mm.toUtf8().constData());
   while (i.hasNext()) {
     i.next();
-    printf("  - %s : %s\n", i.key().toUtf8().constData(), i.value().toUtf8().constData());
+    printf("  - %s : %s\n\n", i.key().toUtf8().constData(), i.value().toUtf8().constData());
+    downloadExternProto(i.value());
   }
 
   while (tokenizer->hasMoreTokens() && tokenizer->peekWord() != "PROTO")
@@ -601,4 +609,16 @@ bool WbProtoModel::checkIfDocumentationPageExist(const QString &page) const {
   file.close();
 
   return exist;
+}
+void WbProtoModel::downloadExternProto(QString url) {
+  printf("Downloading: %s\n", url.toUtf8().constData());
+  if (url.size() == 0)
+    return;
+  if (WbUrl::isWeb(url)) {
+    if (mDownloader != NULL && mDownloader->device() != NULL)
+      delete mDownloader;
+    mDownloader = new WbDownloader(this);
+    mDownloader->download(QUrl(url));
+    printf(" > done\n");
+  }
 }

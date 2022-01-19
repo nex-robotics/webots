@@ -14,8 +14,6 @@
 
 #include "WbProtoList.hpp"
 
-#include "../nodes/utils/WbDownloader.hpp"
-#include "../nodes/utils/WbUrl.hpp"
 #include "WbNode.hpp"
 #include "WbParser.hpp"
 #include "WbPreferences.hpp"
@@ -138,11 +136,8 @@ WbProtoModel *WbProtoList::readModel(const QString &fileName, const QString &wor
   printf("readmodel (next word is %s)\n", tokenizer.peekWord().toUtf8().constData());
   WbParser parser(&tokenizer);
 
-  if (tokenizer.peekWord() == "EXTERNPROTO")
-    parser.parseExternProto(worldPath);
-
-  if (!parser.parseProtoInterface(worldPath))
-    return NULL;
+  // if (!parser.parseProtoInterface(worldPath))
+  //  return NULL;
 
   tokenizer.rewind();
   bool prevInstantiateMode = WbNode::instantiateMode();
@@ -179,12 +174,8 @@ WbProtoModel *WbProtoList::findModel(const QString &modelName, const QString &wo
     if (model->name() == modelName)
       return model;
 
-  printf(" > not known, download");
-
-  /*
   QFileInfoList availableProtoFiles;
   availableProtoFiles << mPrimaryProtoCache << gExtraProtoCache << gProjectsProtoCache << gResourcesProtoCache;
-  printf("find model\n");
   foreach (const QFileInfo &fi, availableProtoFiles) {
     if (fi.baseName() == modelName) {
       WbProtoModel *model = readModel(fi.absoluteFilePath(), worldPath, baseTypeList);
@@ -195,7 +186,6 @@ WbProtoModel *WbProtoList::findModel(const QString &modelName, const QString &wo
       return model;
     }
   }
-  */
 
   return NULL;  // not found
 }
@@ -241,15 +231,4 @@ QStringList WbProtoList::fileList(int cache) {
     list.append(fi.baseName());
 
   return list;
-}
-
-void WbProtoList::downloadExternProto(QString &url) {
-  if (url.size() == 0)
-    return;
-  if (WbUrl::isWeb(url)) {
-    if (mDownloader != NULL && mDownloader->device() != NULL)
-      delete mDownloader;
-    mDownloader = new WbDownloader(this);
-    mDownloader->download(QUrl(url));
-  }
 }
