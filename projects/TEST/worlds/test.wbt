@@ -1,4 +1,7 @@
 #VRML_SIM R2022b utf8
+
+EXTERNPROTO ExternProto "webots://projects/TEST/protos/ExternProto.proto"
+
 WorldInfo {
 }
 Viewpoint {
@@ -8,6 +11,9 @@ Background {
     0.15 0.45 1
   ]
 }
-ProtoWithExternReference {
+ExternProto {
 
 }
+# ProtoWithExternReference {
+#
+# }

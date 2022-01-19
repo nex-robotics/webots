@@ -203,8 +203,12 @@ bool WbParser::parseWorld(const QString &worldPath) {
   mTokenizer->rewind();
   mMode = WBT;
   try {
-    while (!peekToken()->isEof())
+    while (!peekToken()->isEof()) {
+      if (peekWord() == "EXTERNPROTO")
+        parseExternProto(worldPath);
+
       parseNode(worldPath);
+    }
   } catch (...) {
     return false;
   }
@@ -320,7 +324,9 @@ void WbParser::parseExactWord(const QString &word) {
 }
 
 void WbParser::parseNode(const QString &worldPath) {
-  printf("parseNode %s\n", peekWord().toUtf8().constData());
+  printf("parseNode (next word: %s / mode %d)\n", peekWord().toUtf8().constData(), mMode);
+
+  // TODO: does calling parseExternProto here cover all cases ? (proto and world)
 
   if (peekWord() == "USE") {
     skipToken();
@@ -355,7 +361,8 @@ void WbParser::parseNode(const QString &worldPath) {
     }
     return;
   }
-  printf(" > is proto\n");
+
+  printf(" > node is a proto\n");
   const WbProtoModel *const protoModel = WbProtoList::current()->findModel(nodeName, worldPath);
   if (protoModel) {
     parseExactWord("{");
@@ -473,22 +480,15 @@ bool WbParser::parseProtoBody(const QString &worldPath) {
   return true;
 }
 
-bool WbParser::parseExternProto(const QString &worldPath) {
+void WbParser::parseExternProto(const QString &worldPath) {
   printf(" > parseExternProto\n");
-  // mMode = PROTO; // needed?
+  // note: mMode should not be set as it might be a PROTO or a world
 
-  try {
-    parseExactWord("EXTERNPROTO");
-    const QString identifier = parseIdentifier();
-    const QString url = parseUrl();
-    // printf(" >> found: %s %s\n", identifier.toUtf8().constData(), url.toUtf8().constData());
-    mTokenizer->insertExternProtoReference(identifier, url);
-  } catch (...) {
-    printf(" >> failure\n");
-    return false;
-  }
-
-  return true;
+  parseExactWord("EXTERNPROTO");
+  const QString identifier = parseIdentifier();
+  const QString url = parseUrl();
+  // printf(" >> found: %s %s\n", identifier.toUtf8().constData(), url.toUtf8().constData());
+  mTokenizer->insertExternProtoReference(identifier, url);
 }
 
 void WbParser::skipProtoDefinition(WbTokenizer *tokenizer) {
