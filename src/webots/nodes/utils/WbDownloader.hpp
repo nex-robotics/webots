@@ -26,8 +26,8 @@ class WbDownloader : public QObject {
 public:
   explicit WbDownloader(QObject *parent = NULL);
   ~WbDownloader();
-  void download(const QUrl &url);
-  void download(const QUrl &url, const QString destination);
+  void download(const QUrl &url, const QString &destination = QString());
+  // void download(const QUrl &url, const QString destination);
   const QUrl &url() const { return mUrl; }
   QIODevice *device() const;
   bool isCopy() const { return mCopy; }
@@ -43,17 +43,17 @@ signals:
 
 private:
   QUrl mUrl;
-  QString mDestination;
   QNetworkReply *mNetworkReply;
   bool mFinished;
   QString mError;
   bool mOffline;
   bool mCopy;
   bool mIsBackground;
+  QString mDestination;
 
 private slots:
   void finished();
-  void finished_tmp();
+  // void finished_tmp();
   static void displayPopUp();
 };
 

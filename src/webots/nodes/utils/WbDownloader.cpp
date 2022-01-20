@@ -47,7 +47,8 @@ WbDownloader::WbDownloader(QObject *parent) :
   mFinished(false),
   mOffline(false),
   mCopy(false),
-  mIsBackground(false) {
+  mIsBackground(false),
+  mDestination(QString()) {
   gCount++;
 }
 
@@ -66,6 +67,7 @@ QIODevice *WbDownloader::device() const {
   return dynamic_cast<QIODevice *>(mNetworkReply);
 }
 
+/*
 void WbDownloader::download(const QUrl &url, const QString destination) {
   WbSimulationState::instance()->pauseSimulation();
 
@@ -79,15 +81,16 @@ void WbDownloader::download(const QUrl &url, const QString destination) {
   connect(mNetworkReply, &QNetworkReply::finished, this, &WbDownloader::finished_tmp, Qt::UniqueConnection);
   connect(WbApplication::instance(), &WbApplication::worldLoadingWasCanceled, mNetworkReply, &QNetworkReply::abort);
 }
-
-void WbDownloader::download(const QUrl &url) {
+*/
+void WbDownloader::download(const QUrl &url, const QString &destination) {
   WbSimulationState::instance()->pauseSimulation();
 
   mUrl = url;
+  mDestination = destination;
 
   if (gUrlCache.contains(mUrl) && !mIsBackground &&
-      (mUrl.toString().endsWith(".png", Qt::CaseInsensitive) || url.toString().endsWith(".jpg", Qt::CaseInsensitive) ||
-       url.toString().endsWith(".proto", Qt::CaseInsensitive))) {
+      (mUrl.toString().endsWith(".png", Qt::CaseInsensitive) || mUrl.toString().endsWith(".jpg", Qt::CaseInsensitive) ||
+       mUrl.toString().endsWith(".proto", Qt::CaseInsensitive))) {
     if (!(mOffline == true && mCopy == false)) {
       mCopy = true;
       QNetworkReply *reply = gUrlCache[mUrl];
@@ -121,7 +124,7 @@ void WbDownloader::download(const QUrl &url) {
 
   gUrlCache.insert(url, mNetworkReply);
 }
-
+/*
 void WbDownloader::finished_tmp() {
   assert(mDestination.size() > 0);
 
@@ -135,6 +138,7 @@ void WbDownloader::finished_tmp() {
 
   file.write(mNetworkReply->readAll());
 }
+*/
 
 void WbDownloader::finished() {
   if (!mCopy) {
@@ -161,6 +165,14 @@ void WbDownloader::finished() {
       metaData.setExpirationDate(QDateTime::currentDateTime().addDays(1));
       WbNetwork::instance()->networkAccessManager()->cache()->updateMetaData(metaData);
     }
+  }
+
+  if (mUrl.toString().endsWith(".proto", Qt::CaseInsensitive) && !mDestination.isEmpty()) {
+    QFile file(mDestination);
+    if (!file.open(QIODevice::WriteOnly))
+      mError = tr("Couldn't write %1 to disk.\n").arg(mDestination);
+    file.write(mNetworkReply->readAll());
+    file.close();
   }
 
   gComplete++;

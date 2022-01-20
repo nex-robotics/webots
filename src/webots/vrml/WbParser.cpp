@@ -30,6 +30,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QRegularExpression>
 
 //#include <QtNetwork/QNetworkReply>
 
@@ -499,7 +500,7 @@ void WbParser::skipProtoDefinition(WbTokenizer *tokenizer) {
   parser.parseProtoDefinition("");
 }
 
-void WbParser::parseExternProto(const QString &worldPath) {
+void WbParser::parseExternProto(const QString &worldPath) {  // TODO: argument needed?
   printf(" > parseExternProto\n");
   // note: mMode should not be set as it might be a PROTO or a world
 
@@ -507,7 +508,8 @@ void WbParser::parseExternProto(const QString &worldPath) {
   const QString identifier = parseIdentifier();
   const QString url = parseUrl();
 
-  QString path = WbStandardPaths::webotsTmpPath() + "protos/" + identifier + "/" + identifier + ".proto";
+  const QString rootPath = WbStandardPaths::webotsTmpPath() + "protos/" + identifier + "/";
+  const QString path = rootPath + identifier + ".proto";
   QFileInfo file(path);
   printf("> will download to: %s\n", path.toUtf8().constData());
 
@@ -520,43 +522,18 @@ void WbParser::parseExternProto(const QString &worldPath) {
       delete mDownloader;
     mDownloader = new WbDownloader(this);
     mDownloader->download(QUrl(url), file.filePath());
-    /*
-    QNetworkRequest request;
-    request.setUrl(QUrl(url));
-    QNetworkReply *reply = WbNetwork::instance()->networkAccessManager()->get(request);
-    connect(reply, &QNetworkReply::finished, this, &WbParser::downloadReplyFinished, Qt::UniqueConnection);
-    */
+
+    // TODO: for now we just search in the "protos" folder inside tmp. Any reason to have separate paths for each primary proto?
+    WbProtoList::current()->insertProtoSearchPath(WbStandardPaths::webotsTmpPath());
 
     // recursively retrieve other externs
+    QFile file(path);  // TODO: should be triggered by a signal, file might not be ready yet
+    if (file.open(QIODevice::ReadOnly)) {
+      const QString content = file.readAll();
+      QRegularExpression re("EXTERNPROTO");
+      QRegularExpressionMatchIterator it = re.globalMatch(content);
+      while (it.hasNext()) {
+      }
+    }
   }
-
-  // QFile::copy(file.absoluteFilePath(), WbStandardPaths::webotsTmpPath() + file.fileName());
-
-  // printf(" >> found: %s %s\n", identifier.toUtf8().constData(), url.toUtf8().constData());
-  // mTokenizer->insertExternProtoReference(identifier, url);)
 }
-
-/*
-void WbParser::downloadFinished() {
-  QNetworkReply *reply = dynamic_cast<QNetworkReply *>(sender());
-  assert(reply);
-  if (!reply)
-    return;
-
-  disconnect(reply, &QNetworkReply::finished, this, &WbParser::downloadFinished);
-
-  if (reply->error()) {
-    mError = tr("Error while downloading extern proto: \"%1\"").arg(reply->errorString());
-    reply->deleteLater();
-    return;
-  }
-
-  QString out = WbStandardPaths::webotsTmpPath() + "matest.proto";
-
-  QFile file(out);
-  file.open(QIODevice::WriteOnly);
-  file.write(reply->readAll());
-
-  reply->deleteLater();
-}
-*/

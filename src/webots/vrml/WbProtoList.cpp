@@ -55,6 +55,8 @@ WbProtoList::~WbProtoList() {
 
   foreach (WbProtoModel *model, mModels)
     model->unref();
+
+  clearProtoSearchPaths();
 }
 
 void WbProtoList::findProtosRecursively(const QString &dirPath, QFileInfoList &protoList, bool inProtos) {
@@ -174,9 +176,12 @@ WbProtoModel *WbProtoList::findModel(const QString &modelName, const QString &wo
     if (model->name() == modelName)
       return model;
 
-  QFileInfoList availableProtoFiles;
-  availableProtoFiles << mPrimaryProtoCache << gExtraProtoCache << gProjectsProtoCache << gResourcesProtoCache;
-  foreach (const QFileInfo &fi, availableProtoFiles) {
+  QFileInfoList tmpProto;  // protos in Webots temporary folder (i.e added by EXTERNPROTO reference)
+  foreach (const QString &path, mProtoSearchPaths)
+    findProtosRecursively(path, tmpProto);  // TODO: works because folder in tmp is called "protos". No need to have list of
+                                            // searchable paths for each primary proto if this is good enough
+
+  foreach (const QFileInfo &fi, tmpProto) {
     if (fi.baseName() == modelName) {
       WbProtoModel *model = readModel(fi.absoluteFilePath(), worldPath, baseTypeList);
       if (model == NULL)  // can occur if the PROTO contains errors
@@ -191,6 +196,7 @@ WbProtoModel *WbProtoList::findModel(const QString &modelName, const QString &wo
 }
 
 QString WbProtoList::findModelPath(const QString &modelName) const {
+  printf("WbProtoList::findModelPath\n");
   QFileInfoList availableProtoFiles;
   availableProtoFiles << mPrimaryProtoCache << gExtraProtoCache << gProjectsProtoCache << gResourcesProtoCache;
 
@@ -231,4 +237,20 @@ QStringList WbProtoList::fileList(int cache) {
     list.append(fi.baseName());
 
   return list;
+}
+
+void WbProtoList::clearProtoSearchPaths(void) {
+  printf("> clearing proto search paths\n");
+  mProtoSearchPaths.clear();
+  // TODO: add current working project path by default (location of world file), others?
+}
+
+void WbProtoList::insertProtoSearchPath(const QString &path) {
+  QDir dir(path);
+  if (dir.exists() && !mProtoSearchPaths.contains(path))
+    mProtoSearchPaths << path;
+
+  printf("Searchable paths:\n");
+  foreach (const QString &path, mProtoSearchPaths)
+    printf("- %s\n", path.toUtf8().constData());
 }

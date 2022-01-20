@@ -70,6 +70,10 @@ public:
   // prerequisite: the syntax must have been checked with WbParser
   void readModel(WbTokenizer *tokenizer, const QString &worldPath);
 
+  // allows to manage active searchable paths for PROTO files
+  void clearProtoSearchPaths(void);
+  void insertProtoSearchPath(const QString &path);
+
 private:
   // cppcheck-suppress unknownMacro
   Q_DISABLE_COPY(WbProtoList)
@@ -81,6 +85,8 @@ private:
   static QFileInfoList gProjectsProtoCache;
   static QFileInfoList gExtraProtoCache;
   QFileInfoList mPrimaryProtoCache;
+
+  QStringList mProtoSearchPaths;
 
   static void updateProjectsProtoCache();
   static void updateResourcesProtoCache();
