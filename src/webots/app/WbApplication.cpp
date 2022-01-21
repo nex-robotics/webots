@@ -14,6 +14,7 @@
 
 #include "WbApplication.hpp"
 
+#include "../nodes/utils/WbDownloader.hpp"
 #include "WbAnimationRecorder.hpp"
 #include "WbApplicationInfo.hpp"
 #include "WbBoundingSphere.hpp"
@@ -36,6 +37,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QDirIterator>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QRegularExpression>
 
 #include <cassert>
 
@@ -49,6 +51,8 @@ WbApplication::WbApplication() {
   mWorld = NULL;
   mWorldLoadingCanceled = false;
   mWorldLoadingProgressDialogCreated = false;
+
+  mDownloader = NULL;
 
   // create the Webots temporary path early in the process
   // in order to be sure that the Qt internal files will be stored
@@ -105,6 +109,8 @@ WbApplication::~WbApplication() {
   WbPreferences::cleanup();
   WbNodeOperations::cleanup();
   cInstance = NULL;
+
+  // TODO: need to delete mDownloader?
 
   // remove links to project dynamic libraries
   removeOldLibraries();
@@ -281,6 +287,8 @@ bool WbApplication::loadWorld(QString worldName, bool reloading) {
   QString newProjectPath = WbProject::projectPathFromWorldFile(worldName, isValidProject);
   WbProtoList *protoList = new WbProtoList(isValidProject ? newProjectPath + "protos" : "");
 
+  recursivelyRetrieveExternReferences(worldName);
+
   setWorldLoadingStatus(tr("Reading world file "));
   if (wasWorldLoadingCanceled()) {
     delete protoList;
@@ -393,4 +401,47 @@ void WbApplication::stopAnimationCapture() {
 void WbApplication::resetPhysics() {
   foreach (WbSolid *solid, WbWorld::instance()->topSolids())
     solid->resetPhysics();
+}
+
+void WbApplication::recursivelyRetrieveExternReferences(const QString &filename) {
+  QFile file(filename);
+  if (file.open(QIODevice::ReadOnly)) {
+    const QString content = file.readAll();
+
+    QRegularExpression re("EXTERNPROTO\\s([a-zA-Z0-9-_+]+)\\s\"(.*\\.proto)\"");  // TODO: test it more
+
+    QRegularExpressionMatchIterator it = re.globalMatch(content);
+    while (it.hasNext()) {
+      QRegularExpressionMatch match = it.next();
+      if (match.hasMatch()) {
+        const QString identifier = match.captured(1);
+        const QString url = match.captured(2);
+        printf("REGEX found >>%s<< >>%s<<\n", identifier.toUtf8().constData(), url.toUtf8().constData());
+
+        // create directory for this proto
+        const QString rootPath = WbStandardPaths::webotsTmpProtoPath() + identifier + "/";
+        const QString path = rootPath + identifier + ".proto";
+        QFileInfo protoFile(path);
+
+        if (!protoFile.exists()) {
+          printf("> will download to: %s\n", path.toUtf8().constData());
+          QDir dir;
+          dir.mkpath(protoFile.absolutePath());
+
+          if (mDownloader != NULL && mDownloader->device() != NULL)
+            delete mDownloader;
+          mDownloader = new WbDownloader(this);
+          mDownloader->download(QUrl(url), protoFile.filePath());
+
+          connect(mDownloader, &WbDownloader::complete, this, &WbApplication::downloadCompleted);
+        } else
+          printf("> %s already exists in tmp\n", identifier.toUtf8().constData());
+      }
+    }
+  } else
+    WbLog::error(tr("Could not open file: '%1'.").arg(filename));
+}
+
+void WbApplication::downloadCompleted() {
+  recursivelyRetrieveExternReferences();
 }

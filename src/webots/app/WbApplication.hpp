@@ -25,6 +25,7 @@
 
 class WbControlledWorld;
 class QElapsedTimer;
+class WbDownloader;
 
 class WbApplication : public QObject {
   Q_OBJECT
@@ -121,11 +122,15 @@ private:
   bool mWorldLoadingCanceled;
   bool mWorldLoadingProgressDialogCreated;
 
+  WbDownloader *mDownloader;
+
   // remove links to the project dynamic libraries
   void removeOldLibraries();
 
   // delete the progress dialog and eventually load empty world
   bool cancelWorldLoading(bool loadEmptyWorld, bool deleteWorld = false);
+
+  void recursivelyRetrieveExternReferences(const QString &filename);
 };
 
 #endif

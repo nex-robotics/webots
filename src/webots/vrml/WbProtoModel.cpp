@@ -71,11 +71,9 @@ WbProtoModel::WbProtoModel(WbTokenizer *tokenizer, const QString &worldPath, con
   mTemplateLanguage = tokenizer->templateLanguage();
   mIsDeterministic = !mTags.contains("nonDeterministic");
 
-  // consume tokens until "PROTO" is found, typically entails skipping EXTERNPROTO references (which are known already)
   WbParser parser(tokenizer);
-
-  if (tokenizer->peekWord() == "EXTERNPROTO")
-    parser.parseExternProto(worldPath);
+  while (tokenizer->peekWord() == "EXTERNPROTO")  // consume all EXTERNPROTO tokens, if any
+    parser.skipExternProto();
 
   mExternProto = tokenizer->externProto();
   QMapIterator<QString, QString> i(mExternProto);
