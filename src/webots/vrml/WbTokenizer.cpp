@@ -45,7 +45,6 @@ WbTokenizer::WbTokenizer() :
 }
 
 WbTokenizer::~WbTokenizer() {
-  mExternProto.clear();
   qDeleteAll(mVector);
 }
 
@@ -650,14 +649,4 @@ void WbTokenizer::skipField(bool deleteTokens) {
     mVector.remove(startPos, mIndex - startPos);
     mIndex = startPos;
   }
-}
-
-void WbTokenizer::insertExternProtoReference(QString nodeName, QString url) {
-  // if within the same tokenizer context (i.e same world, same proto, or same wbo) the same identifier points to
-  // different urls, only the last one is considered standing
-  if (!mExternProto.contains(nodeName))
-    mExternProto.insert(nodeName, url);
-  else
-    mExternProto[nodeName] = url;  // overwrite
-  // TODO: print warning if already exists?
 }

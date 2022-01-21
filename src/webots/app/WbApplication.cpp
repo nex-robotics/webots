@@ -262,8 +262,9 @@ bool WbApplication::loadWorld(QString worldName, bool reloading) {
   mWorldLoadingCanceled = false;
   mWorldLoadingProgressDialogCreated = false;
 
-  QDir(WbStandardPaths::webotsTmpProtoPath()).removeRecursively();
-  QDir().mkdir(WbStandardPaths::webotsTmpProtoPath());
+  const QString &tmpProtoDirectory = WbStandardPaths::webotsTmpProtoPath();
+  if (QDir(tmpProtoDirectory).removeRecursively())
+    QDir().mkdir(tmpProtoDirectory);
 
   WbNodeOperations::instance()->enableSolidNameClashCheckOnNodeRegeneration(false);
 

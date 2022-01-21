@@ -53,7 +53,6 @@ public:
   bool parseProtoInterface(const QString &worldPath);  // parse PROTO interface in original file
   bool parseProtoBody(const QString &worldPath);       // parse resulting PROTO after
                                                        // template generation
-  void parseExternProto(const QString &worldPath);     // parse EXTERNPROTO references
   void skipExternProto();
 
   // skip PROTO definition in the specified tokenizer

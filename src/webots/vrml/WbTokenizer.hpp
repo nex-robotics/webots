@@ -68,10 +68,6 @@ public:
   // static method returning the current world file version
   static const WbVersion &worldFileVersion();
 
-  // methods to insert (by WbParser) or obtain the list of EXTERNPROTO associated with a tokenizer (of a world/proto/wbo)
-  void insertExternProtoReference(QString nodeName, QString url);
-  QMap<QString, QString> externProto() { return mExternProto; };
-
   // returns true if peekToken() or nextToken() would be valid
   bool hasMoreTokens() const { return mIndex < mVector.size(); }
 
@@ -139,7 +135,6 @@ private:
   bool mAtEnd;
   QString mErrorPrefix;
   int mErrorOffset;
-  QMap<QString, QString> mExternProto;
 
   QString readLine();
   QChar readChar();
