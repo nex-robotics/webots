@@ -180,6 +180,7 @@ WbProtoModel *WbProtoList::findModel(const QString &modelName, const QString &wo
   foreach (const QString &path, WbStandardPaths::webotsTmpProtoPath())
     findProtosRecursively(path, tmpProto);  // TODO: works because folder in tmp is called "protos". No need to have list of
                                             // searchable paths for each primary proto if this is good enough
+  printf("> done searching\n");
 
   foreach (const QFileInfo &fi, tmpProto) {
     if (fi.baseName() == modelName) {

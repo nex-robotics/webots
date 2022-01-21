@@ -114,6 +114,7 @@ WbWorld::WbWorld(WbProtoList *protos, WbTokenizer *tokenizer) :
     mPerspective = new WbPerspective(mFileName);
     mPerspective->load();
 
+    WbApplication::instance()->setWorldLoadingStatus(tr("Retrieving extern proto (if any)"));
     recursivelyRetrieveExternReferences(mFileName);
 
     // read/create nodes
@@ -725,5 +726,6 @@ void WbWorld::recursivelyRetrieveExternReferences(const QString &filename) {
 }
 
 void WbWorld::downloadCompleted() {
+  printf("Download completed\n");
   recursivelyRetrieveExternReferences(mDownloader->mDestination);
 }
