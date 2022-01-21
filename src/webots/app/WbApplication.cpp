@@ -416,11 +416,17 @@ void WbApplication::recursivelyRetrieveExternReferences(const QString &filename)
       if (match.hasMatch()) {
         const QString identifier = match.captured(1);
         const QString url = match.captured(2);
+        if (!url.endsWith(identifier + ".proto")) {
+          WbLog::error(tr("Malformed extern proto url. The identifier and url do not coincide.\n"));
+          return;
+        }
+
         printf("REGEX found >>%s<< >>%s<<\n", identifier.toUtf8().constData(), url.toUtf8().constData());
 
         // create directory for this proto
         const QString rootPath = WbStandardPaths::webotsTmpProtoPath() + identifier + "/";
         const QString path = rootPath + identifier + ".proto";
+
         QFileInfo protoFile(path);
 
         if (!protoFile.exists()) {
@@ -443,5 +449,5 @@ void WbApplication::recursivelyRetrieveExternReferences(const QString &filename)
 }
 
 void WbApplication::downloadCompleted() {
-  recursivelyRetrieveExternReferences();
+  recursivelyRetrieveExternReferences(mDownloader->mDestination);
 }

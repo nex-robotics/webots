@@ -111,6 +111,8 @@ public slots:
   void setWorldLoadingStatus(const QString &status);
   void setWorldLoadingProgressDialogCreatedtoFalse();
 
+  void downloadCompleted();  // TODO: find better name
+
 private:
   static WbApplication *cInstance;
   static QString cWebotsTmpDirName;

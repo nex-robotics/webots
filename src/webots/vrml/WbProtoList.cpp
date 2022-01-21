@@ -177,7 +177,7 @@ WbProtoModel *WbProtoList::findModel(const QString &modelName, const QString &wo
       return model;
 
   QFileInfoList tmpProto;  // protos in Webots temporary folder (i.e added by EXTERNPROTO reference)
-  foreach (const QString &path, mProtoSearchPaths)
+  foreach (const QString &path, WbStandardPaths::webotsTmpProtoPath())
     findProtosRecursively(path, tmpProto);  // TODO: works because folder in tmp is called "protos". No need to have list of
                                             // searchable paths for each primary proto if this is good enough
 

@@ -36,6 +36,7 @@ public:
   const QString &error() const { return mError; }
   static int progress();
   static void reset();
+  QString mDestination;
 
 signals:
   void complete();
@@ -49,7 +50,6 @@ private:
   bool mOffline;
   bool mCopy;
   bool mIsBackground;
-  QString mDestination;
 
 private slots:
   void finished();
