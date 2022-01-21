@@ -245,7 +245,7 @@ WbProtoModel::WbProtoModel(WbTokenizer *tokenizer, const QString &worldPath, con
         bool error = false;
         try {
           baseTypeList.append(mName);
-          WbProtoModel *baseProtoModel = WbProtoList::current()->findModel(mBaseType, worldPath, baseTypeList);
+          WbProtoModel *baseProtoModel = WbProtoList::current()->customFindModel(mBaseType, worldPath, baseTypeList);
           mAncestorProtoModel = baseProtoModel;
           if (baseProtoModel) {
             mAncestorProtoName = mBaseType;

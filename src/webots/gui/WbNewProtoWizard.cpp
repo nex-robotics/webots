@@ -119,7 +119,7 @@ void WbNewProtoWizard::accept() {
     // if base node was selected, define exposed parameters and PROTO body accordingly
     if (mBaseNode != "") {
       if (mIsProtoNode) {
-        WbProtoModel *protoModel = WbProtoList::current()->findModel(mBaseNode, "");
+        WbProtoModel *protoModel = WbProtoList::current()->customFindModel(mBaseNode, "");
         assert(protoModel);
         fieldModels = protoModel->fieldModels();
       } else {
@@ -357,7 +357,7 @@ void WbNewProtoWizard::updateBaseNode() {
 
   QStringList fieldNames;
   if (topLevel->type() == PROTO_NODE_LIST) {
-    WbProtoModel *protoModel = WbProtoList::current()->findModel(mBaseNode, WbStandardPaths::projectsPath());
+    WbProtoModel *protoModel = WbProtoList::current()->customFindModel(mBaseNode, WbStandardPaths::projectsPath());
     fieldNames = protoModel->parameterNames();
     mIsProtoNode = true;
   } else {

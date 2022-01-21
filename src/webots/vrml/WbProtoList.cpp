@@ -23,6 +23,7 @@
 #include "WbVrmlWriter.hpp"
 
 #include <QtCore/QDir>
+#include <QtCore/QDirIterator>
 
 WbProtoList *gCurrent = NULL;
 QFileInfoList WbProtoList::gResourcesProtoCache;
@@ -167,6 +168,35 @@ void WbProtoList::readModel(WbTokenizer *tokenizer, const QString &worldPath) {
   }
   mModels.prepend(model);
   model->ref();
+}
+
+WbProtoModel *WbProtoList::customFindModel(const QString &modelName, const QString &worldPath, QStringList baseTypeList) {
+  printf("WbProtoList::customFindModel\n");
+  foreach (WbProtoModel *model, mModels)
+    if (model->name() == modelName)
+      return model;
+
+  QFileInfoList tmpProto;
+
+  QDirIterator it(WbStandardPaths::webotsTmpProtoPath(), QStringList("*.proto"), QDir::Files, QDirIterator::Subdirectories);
+  while (it.hasNext()) {
+    QFileInfo fi(it.next());
+    tmpProto << fi;
+    printf("-- found %s\n", fi.fileName().toUtf8().constData());
+  }
+
+  foreach (const QFileInfo &fi, tmpProto) {
+    if (fi.baseName() == modelName) {
+      WbProtoModel *model = readModel(fi.absoluteFilePath(), worldPath, baseTypeList);
+      if (model == NULL)  // can occur if the PROTO contains errors
+        return NULL;
+      mModels << model;
+      model->ref();
+      return model;
+    }
+  }
+
+  return NULL;
 }
 
 WbProtoModel *WbProtoList::findModel(const QString &modelName, const QString &worldPath, QStringList baseTypeList) {
