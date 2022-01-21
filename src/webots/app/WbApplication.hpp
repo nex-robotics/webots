@@ -25,7 +25,6 @@
 
 class WbControlledWorld;
 class QElapsedTimer;
-class WbDownloader;
 
 class WbApplication : public QObject {
   Q_OBJECT
@@ -111,8 +110,6 @@ public slots:
   void setWorldLoadingStatus(const QString &status);
   void setWorldLoadingProgressDialogCreatedtoFalse();
 
-  void downloadCompleted();  // TODO: find better name
-
 private:
   static WbApplication *cInstance;
   static QString cWebotsTmpDirName;
@@ -124,15 +121,11 @@ private:
   bool mWorldLoadingCanceled;
   bool mWorldLoadingProgressDialogCreated;
 
-  WbDownloader *mDownloader;
-
   // remove links to the project dynamic libraries
   void removeOldLibraries();
 
   // delete the progress dialog and eventually load empty world
   bool cancelWorldLoading(bool loadEmptyWorld, bool deleteWorld = false);
-
-  void recursivelyRetrieveExternReferences(const QString &filename);
 };
 
 #endif

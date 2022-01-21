@@ -91,7 +91,8 @@ WbWorld::WbWorld(WbProtoList *protos, WbTokenizer *tokenizer) :
   mLastAwakeningTime(0.0),
   mIsLoading(true),
   mIsCleaning(false),
-  mIsVideoRecording(false) {
+  mIsVideoRecording(false),
+  mDownloader(NULL) {
   gInstance = this;
   WbNode::setInstantiateMode(true);
   WbNode::setGlobalParentNode(NULL);
@@ -112,6 +113,8 @@ WbWorld::WbWorld(WbProtoList *protos, WbTokenizer *tokenizer) :
 
     mPerspective = new WbPerspective(mFileName);
     mPerspective->load();
+
+    recursivelyRetrieveExternReferences(mFileName);
 
     // read/create nodes
     WbNodeReader reader;
@@ -674,4 +677,53 @@ QString WbWorld::logWorldMetrics() const {
   }
 
   return QString("%1 solids, %2 joints, %3 graphical geometries").arg(solidCount).arg(jointCount).arg(geomCount);
+}
+
+void WbWorld::recursivelyRetrieveExternReferences(const QString &filename) {
+  QFile file(filename);
+  if (file.open(QIODevice::ReadOnly)) {
+    const QString content = file.readAll();
+
+    QRegularExpression re("EXTERNPROTO\\s([a-zA-Z0-9-_+]+)\\s\"(.*\\.proto)\"");  // TODO: test it more
+
+    QRegularExpressionMatchIterator it = re.globalMatch(content);
+    while (it.hasNext()) {
+      QRegularExpressionMatch match = it.next();
+      if (match.hasMatch()) {
+        const QString identifier = match.captured(1);
+        const QString url = match.captured(2);
+        if (!url.endsWith(identifier + ".proto")) {
+          WbLog::error(tr("Malformed extern proto url. The identifier and url do not coincide.\n"));
+          return;
+        }
+
+        printf("REGEX found >>%s<< >>%s<<\n", identifier.toUtf8().constData(), url.toUtf8().constData());
+
+        // create directory for this proto
+        const QString rootPath = WbStandardPaths::webotsTmpProtoPath() + identifier + "/";
+        const QString path = rootPath + identifier + ".proto";
+
+        QFileInfo protoFile(path);
+
+        if (!protoFile.exists()) {
+          printf("> will download to: %s\n", path.toUtf8().constData());
+          QDir dir;
+          dir.mkpath(protoFile.absolutePath());
+
+          if (mDownloader != NULL && mDownloader->device() != NULL)
+            delete mDownloader;
+          mDownloader = new WbDownloader(this);
+          mDownloader->download(QUrl(url), protoFile.filePath());
+
+          connect(mDownloader, &WbDownloader::complete, this, &WbWorld::downloadCompleted);
+        } else
+          printf("> %s already exists in tmp\n", identifier.toUtf8().constData());
+      }
+    }
+  } else
+    WbLog::error(tr("Could not open file: '%1'.").arg(filename));
+}
+
+void WbWorld::downloadCompleted() {
+  recursivelyRetrieveExternReferences(mDownloader->mDestination);
 }
