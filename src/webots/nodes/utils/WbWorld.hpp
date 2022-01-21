@@ -213,7 +213,7 @@ private:
   static bool cX3DMetaFileExport;
   static bool cX3DStreaming;
 
-  void recursivelyRetrieveExternReferences(const QString &filename);
+  void recursivelyRetrieveExternReferences(const QString &filename, const QString &parent);
 
 private slots:
   void updateProjectPath(const QString &oldPath, const QString &newPath);

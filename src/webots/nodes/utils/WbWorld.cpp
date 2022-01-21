@@ -115,7 +115,7 @@ WbWorld::WbWorld(WbProtoList *protos, WbTokenizer *tokenizer) :
     mPerspective->load();
 
     WbApplication::instance()->setWorldLoadingStatus(tr("Retrieving extern proto (if any)"));
-    recursivelyRetrieveExternReferences(mFileName);
+    recursivelyRetrieveExternReferences(mFileName, QString());
 
     // read/create nodes
     WbNodeReader reader;
@@ -680,7 +680,7 @@ QString WbWorld::logWorldMetrics() const {
   return QString("%1 solids, %2 joints, %3 graphical geometries").arg(solidCount).arg(jointCount).arg(geomCount);
 }
 
-void WbWorld::recursivelyRetrieveExternReferences(const QString &filename) {
+void WbWorld::recursivelyRetrieveExternReferences(const QString &filename, const QString &parent) {
   QFile file(filename);
   if (file.open(QIODevice::ReadOnly)) {
     const QString content = file.readAll();
@@ -701,7 +701,11 @@ void WbWorld::recursivelyRetrieveExternReferences(const QString &filename) {
         printf("REGEX found >>%s<< >>%s<<\n", identifier.toUtf8().constData(), url.toUtf8().constData());
 
         // create directory for this proto
-        const QString rootPath = WbStandardPaths::webotsTmpProtoPath() + identifier + "/";
+
+        QString rootPath = WbStandardPaths::webotsTmpProtoPath();
+        if (!parent.isEmpty())
+          rootPath += parent + "/";
+        rootPath += identifier + "/";
         const QString path = rootPath + identifier + ".proto";
 
         QFileInfo protoFile(path);
@@ -710,6 +714,7 @@ void WbWorld::recursivelyRetrieveExternReferences(const QString &filename) {
           printf("> will download to: %s\n", path.toUtf8().constData());
           QDir dir;
           dir.mkpath(protoFile.absolutePath());
+          printf("making dir %s\n", protoFile.absolutePath().toUtf8().constData());
 
           if (mDownloader != NULL && mDownloader->device() != NULL)
             delete mDownloader;
@@ -727,5 +732,6 @@ void WbWorld::recursivelyRetrieveExternReferences(const QString &filename) {
 
 void WbWorld::downloadCompleted() {
   printf("Download completed\n");
-  recursivelyRetrieveExternReferences(mDownloader->mDestination);
+  const QString parent = QFileInfo(mDownloader->mDestination).baseName();
+  recursivelyRetrieveExternReferences(mDownloader->mDestination, parent);
 }
