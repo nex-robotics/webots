@@ -87,7 +87,7 @@ WbWorld::WbWorld(WbProtoList *protos, WbTokenizer *tokenizer) :
   mWorldInfo(NULL),
   mViewpoint(NULL),
   mPerspective(NULL),
-  mProtos(protos ? protos : new WbProtoList()),
+  mProtos(NULL),
   mLastAwakeningTime(0.0),
   mIsLoading(true),
   mIsCleaning(false),
@@ -114,8 +114,9 @@ WbWorld::WbWorld(WbProtoList *protos, WbTokenizer *tokenizer) :
     mPerspective = new WbPerspective(mFileName);
     mPerspective->load();
 
-    WbApplication::instance()->setWorldLoadingStatus(tr("Retrieving extern proto (if any)"));
-    recursivelyRetrieveExternReferences(mFileName, QString());
+    // WbApplication::instance()->setWorldLoadingStatus(tr("Retrieving extern proto (if any)"));
+    // recursivelyRetrieveExternReferences(mFileName, QString());
+    mProtos = protos ? protos : new WbProtoList(mFileName);
 
     // read/create nodes
     WbNodeReader reader;

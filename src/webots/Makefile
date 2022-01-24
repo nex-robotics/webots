@@ -376,6 +376,7 @@ QT_SOURCES += \
   WbPropeller.cpp \
   WbProject.cpp \
   WbProjectRelocationDialog.cpp \
+  WbProtoList.cpp \
   WbProtoModel.cpp \
   WbProtoTemplateEngine.cpp \
   WbQjsFile.cpp \
@@ -533,7 +534,6 @@ OTHER_SOURCES = \
   WbPolygon.cpp \
   WbPrecision.cpp \
   WbProtoCachedInfo.cpp \
-  WbProtoList.cpp \
   WbRandom.cpp \
   WbRay.cpp \
   WbResetCommand.cpp \

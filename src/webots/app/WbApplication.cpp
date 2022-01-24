@@ -55,6 +55,7 @@ WbApplication::WbApplication() {
   // in order to be sure that the Qt internal files will be stored
   // at the right place
   WbStandardPaths::webotsTmpPath();
+  WbStandardPaths::webotsTmpProtoPath();  // TODO: mkdir ...
 
   WbPreferences::createInstance("Cyberbotics", "Webots", WbApplicationInfo::version());
 
@@ -286,7 +287,7 @@ bool WbApplication::loadWorld(QString worldName, bool reloading) {
 
   bool isValidProject = true;
   QString newProjectPath = WbProject::projectPathFromWorldFile(worldName, isValidProject);
-  WbProtoList *protoList = new WbProtoList(isValidProject ? newProjectPath + "protos" : "");
+  WbProtoList *protoList = new WbProtoList(worldName);  // isValidProject ? newProjectPath + "protos" : ""
 
   WbTokenizer tokenizer;
   int errors = tokenizer.tokenize(worldName);

@@ -14,6 +14,8 @@
 
 #include "WbProtoList.hpp"
 
+#include "../nodes/utils/WbDownloader.hpp"
+#include "WbLog.hpp"
 #include "WbNode.hpp"
 #include "WbParser.hpp"
 #include "WbPreferences.hpp"
@@ -24,6 +26,9 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QDirIterator>
+#include <QtCore/QRegularExpression>
+#include <chrono>
+#include <thread>
 
 WbProtoList *gCurrent = NULL;
 QFileInfoList WbProtoList::gResourcesProtoCache;
@@ -34,6 +39,7 @@ WbProtoList *WbProtoList::current() {
   return gCurrent;
 }
 
+/*
 WbProtoList::WbProtoList(const QString &primarySearchPath) {
   gCurrent = this;
   mPrimarySearchPath = primarySearchPath;
@@ -47,6 +53,23 @@ WbProtoList::WbProtoList(const QString &primarySearchPath) {
   }
 
   updatePrimaryProtoCache();
+}
+*/
+
+WbProtoList::WbProtoList(const QString &path) {
+  printf("WbProtoList::WbProtoList()\n");
+  // if first call, open all worlds in projects folder and do shallow retrieval
+  static bool firstCall = true;
+  if (firstCall) {
+    mDownloader = NULL;
+    firstCall = false;
+  }
+
+  // open path (world), retrieve extern, kickoff download (separate recursive function)
+  mDownloadingFiles = 0;
+  recursivelyRetrieveExternProto(path, QString());
+  while (mDownloadingFiles > 0)
+    std::this_thread::sleep_for(std::chrono::microseconds(100));
 }
 
 // we do not delete the PROTO models here: each PROTO model is automatically deleted when its last PROTO instance is deleted
@@ -284,4 +307,60 @@ void WbProtoList::insertProtoSearchPath(const QString &path) {
   printf("Searchable paths:\n");
   foreach (const QString &path, mProtoSearchPaths)
     printf("- %s\n", path.toUtf8().constData());
+}
+
+void WbProtoList::recursivelyRetrieveExternProto(const QString &filename, const QString &parent) {
+  QFile file(filename);
+  if (file.open(QIODevice::ReadOnly)) {
+    const QString content = file.readAll();
+
+    QRegularExpression re("EXTERNPROTO\\s([a-zA-Z0-9-_+]+)\\s\"(.*\\.proto)\"");  // TODO: test it more
+
+    QRegularExpressionMatchIterator it = re.globalMatch(content);
+    while (it.hasNext()) {
+      QRegularExpressionMatch match = it.next();
+      if (match.hasMatch()) {
+        const QString identifier = match.captured(1);
+        const QString url = match.captured(2);
+        if (!url.endsWith(identifier + ".proto")) {
+          WbLog::error(tr("Malformed extern proto url. The identifier and url do not coincide.\n"));
+          return;
+        }
+
+        printf("REGEX found >>%s<< >>%s<<\n", identifier.toUtf8().constData(), url.toUtf8().constData());
+
+        // create directory for this proto
+
+        QString rootPath = WbStandardPaths::webotsTmpProtoPath();
+        if (!parent.isEmpty())
+          rootPath += parent + "/";
+        rootPath += identifier + "/";
+
+        QFileInfo protoFile(rootPath + identifier + ".proto");
+
+        if (!protoFile.exists()) {
+          printf("> will download to: %s\n", identifier.toUtf8().constData());
+          QDir dir;
+          dir.mkpath(protoFile.absolutePath());
+          printf("making dir %s\n", protoFile.absolutePath().toUtf8().constData());
+
+          if (mDownloader != NULL && mDownloader->device() != NULL)
+            delete mDownloader;
+          mDownloader = new WbDownloader(this);
+          mDownloader->download(QUrl(url), protoFile.filePath());
+          mDownloadingFiles++;
+          connect(mDownloader, &WbDownloader::complete, this, &WbProtoList::protoRetrieved);
+        } else
+          printf("> %s already exists in tmp\n", identifier.toUtf8().constData());
+      }
+    }
+  } else
+    WbLog::error(tr("Could not open file: '%1'.").arg(filename));
+}
+
+void WbProtoList::protoRetrieved() {
+  printf("Download completed\n");
+  const QString parent = QFileInfo(mDownloader->mDestination).baseName();
+  // recursivelyRetrieveExternProto(mDownloader->mDestination, parent);
+  mDownloadingFiles--;
 }

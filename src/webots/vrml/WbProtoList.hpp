@@ -21,11 +21,14 @@
 
 class WbProtoModel;
 class WbTokenizer;
+class WbDownloader;
 
 #include <QtCore/QFileInfoList>
+#include <QtCore/QObject>
 #include <QtCore/QStringList>
 
-class WbProtoList {
+class WbProtoList : public QObject {
+  Q_OBJECT
 public:
   enum { RESOURCES_PROTO_CACHE, PROJECTS_PROTO_CACHE, EXTRA_PROTO_CACHE };
 
@@ -41,7 +44,8 @@ public:
 
   // create a proto list with a .proto file search path
   // the path will be searched recursively
-  explicit WbProtoList(const QString &primarySearchPath = "");
+  // explicit WbProtoList(const QString &primarySearchPath = "");
+  explicit WbProtoList(const QString &path);
 
   // destroys the list and all the contained models
   ~WbProtoList();
@@ -75,6 +79,11 @@ public:
   void clearProtoSearchPaths(void);
   void insertProtoSearchPath(const QString &path);
 
+  void recursivelyRetrieveExternProto(const QString &filename, const QString &parent);
+
+private slots:
+  void protoRetrieved();
+
 private:
   // cppcheck-suppress unknownMacro
   Q_DISABLE_COPY(WbProtoList)
@@ -88,6 +97,8 @@ private:
   QFileInfoList mPrimaryProtoCache;
 
   QStringList mProtoSearchPaths;
+  int mDownloadingFiles;
+  WbDownloader *mDownloader;
 
   static void updateProjectsProtoCache();
   static void updateResourcesProtoCache();
