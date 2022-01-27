@@ -81,8 +81,17 @@ public:
 
   void recursivelyRetrieveExternProto(const QString &filename, const QString &parent);
 
+  QVector<QPair<QString, QString>> getExternProto(const QString &filename);
+  void recursiveProtoRetrieval(const QString &filename, const QString &parent);
+  void downloadExternProto(const QString &filename, const QString &parent);
+
+signals:
+  void retrieved();
+
 private slots:
   void protoRetrieved();
+  void recurser();
+  void tracker();
 
 private:
   // cppcheck-suppress unknownMacro
@@ -99,6 +108,9 @@ private:
   QStringList mProtoSearchPaths;
   int mDownloadingFiles;
   WbDownloader *mDownloader;
+
+  QVector<WbDownloader *> mRetrievers;
+  int mToRetrieve;
 
   static void updateProjectsProtoCache();
   static void updateResourcesProtoCache();

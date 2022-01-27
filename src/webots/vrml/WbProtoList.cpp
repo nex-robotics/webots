@@ -67,9 +67,12 @@ WbProtoList::WbProtoList(const QString &path) {
 
   // open path (world), retrieve extern, kickoff download (separate recursive function)
   mDownloadingFiles = 0;
-  recursivelyRetrieveExternProto(path, QString());
-  while (mDownloadingFiles > 0)
-    std::this_thread::sleep_for(std::chrono::microseconds(100));
+
+  downloadExternProto(path, QString());
+
+  // recursivelyRetrieveExternProto(path, QString());
+  // while (mDownloadingFiles > 0)
+  //  std::this_thread::sleep_for(std::chrono::microseconds(100));
 }
 
 // we do not delete the PROTO models here: each PROTO model is automatically deleted when its last PROTO instance is deleted
@@ -195,6 +198,8 @@ void WbProtoList::readModel(WbTokenizer *tokenizer, const QString &worldPath) {
 
 WbProtoModel *WbProtoList::customFindModel(const QString &modelName, const QString &worldPath, QStringList baseTypeList) {
   printf("WbProtoList::customFindModel\n");
+  return NULL;
+
   foreach (WbProtoModel *model, mModels)
     if (model->name() == modelName)
       return model;
@@ -363,4 +368,90 @@ void WbProtoList::protoRetrieved() {
   const QString parent = QFileInfo(mDownloader->mDestination).baseName();
   // recursivelyRetrieveExternProto(mDownloader->mDestination, parent);
   mDownloadingFiles--;
+}
+
+// logic
+
+void WbProtoList::downloadExternProto(const QString &filename, const QString &parent) {
+  qDeleteAll(mRetrievers);
+  mRetrievers.clear();
+  mToRetrieve = 0;
+
+  connect(this, &WbProtoList::retrieved, this, &WbProtoList::tracker);
+  recursiveProtoRetrieval(filename, parent);
+}
+
+QVector<QPair<QString, QString>> WbProtoList::getExternProto(const QString &filename) {
+  QVector<QPair<QString, QString>> list;
+
+  QFile file(filename);
+  if (file.open(QIODevice::ReadOnly)) {
+    const QString content = file.readAll();
+
+    QRegularExpression re("EXTERNPROTO\\s([a-zA-Z0-9-_+]+)\\s\"(.*\\.proto)\"");  // TODO: test it more
+
+    QRegularExpressionMatchIterator it = re.globalMatch(content);
+    while (it.hasNext()) {
+      QRegularExpressionMatch match = it.next();
+      if (match.hasMatch()) {
+        QPair<QString, QString> pair;
+        pair.first = match.captured(1);
+        pair.second = match.captured(2);
+
+        if (!pair.second.endsWith(pair.first + ".proto")) {
+          WbLog::error(tr("Malformed extern proto url. The identifier and url do not coincide.\n"));
+          return list;
+        }
+
+        printf("REGEX found >>%s<< >>%s<<\n", pair.first.toUtf8().constData(), pair.second.toUtf8().constData());
+        list.push_back(pair);
+      }
+    }
+  }
+
+  return list;
+}
+
+void WbProtoList::recursiveProtoRetrieval(const QString &filename, const QString &parent) {
+  printf("recursing on: %s with parent >%s<\n", filename.toUtf8().constData(), parent.toUtf8().constData());
+  QVector<QPair<QString, QString>> externProtos = getExternProto(filename);
+
+  for (int i = 0; i < externProtos.size(); ++i) {
+    // create folder
+    QString rootPath = WbStandardPaths::webotsTmpProtoPath();
+    if (!parent.isEmpty())
+      rootPath += parent + "/";
+    rootPath += externProtos[i].first + "/";
+
+    QFileInfo protoFile(rootPath + externProtos[i].first + ".proto");
+    QDir dir;
+    dir.mkpath(protoFile.absolutePath());
+    printf("making dir %s\n", protoFile.absolutePath().toUtf8().constData());
+
+    // download
+    printf("downloading: %s\n", externProtos[i].first.toUtf8().constData());
+    mRetrievers.push_back(new WbDownloader(this));
+    mRetrievers.last()->download(QUrl(externProtos[i].second), externProtos[i].first);
+    mToRetrieve++;
+    connect(mRetrievers.last(), &WbDownloader::complete, this, &WbProtoList::recurser);
+  }
+}
+
+void WbProtoList::recurser() {
+  WbDownloader *retriever = dynamic_cast<WbDownloader *>(sender());
+  printf("Download completed %d\n", retriever == NULL);
+  if (retriever) {
+    const QString parent = QFileInfo(retriever->mDestination).baseName();
+    recursiveProtoRetrieval(retriever->mDestination, parent);
+    emit retrieved();
+  }
+}
+
+void WbProtoList::tracker() {
+  mToRetrieve--;
+
+  if (mToRetrieve == 0) {
+    printf("FINISHED\n");
+    disconnect(this, &WbProtoList::retrieved, this, &WbProtoList::tracker);
+  }
 }
