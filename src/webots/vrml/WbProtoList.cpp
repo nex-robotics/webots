@@ -403,7 +403,7 @@ QVector<QPair<QString, QString>> WbProtoList::getExternProto(const QString &file
           return list;
         }
 
-        printf("REGEX found >>%s<< >>%s<<\n", pair.first.toUtf8().constData(), pair.second.toUtf8().constData());
+        printf(" > found >>%s<< >>%s<<\n", pair.first.toUtf8().constData(), pair.second.toUtf8().constData());
         list.push_back(pair);
       }
     }
@@ -426,12 +426,12 @@ void WbProtoList::recursiveProtoRetrieval(const QString &filename, const QString
     QFileInfo protoFile(rootPath + externProtos[i].first + ".proto");
     QDir dir;
     dir.mkpath(protoFile.absolutePath());
-    printf("making dir %s\n", protoFile.absolutePath().toUtf8().constData());
+    printf(" > making dir %s\n", protoFile.absolutePath().toUtf8().constData());
 
     // download
-    printf("downloading: %s\n", externProtos[i].first.toUtf8().constData());
+    printf(" > downloading: %s to %s\n", externProtos[i].first.toUtf8().constData(), protoFile.filePath().toUtf8().constData());
     mRetrievers.push_back(new WbDownloader(this));
-    mRetrievers.last()->download(QUrl(externProtos[i].second), externProtos[i].first);
+    mRetrievers.last()->download(QUrl(externProtos[i].second), protoFile.filePath());
     mToRetrieve++;
     connect(mRetrievers.last(), &WbDownloader::complete, this, &WbProtoList::recurser);
   }
@@ -439,7 +439,7 @@ void WbProtoList::recursiveProtoRetrieval(const QString &filename, const QString
 
 void WbProtoList::recurser() {
   WbDownloader *retriever = dynamic_cast<WbDownloader *>(sender());
-  printf("Download completed %d\n", retriever == NULL);
+  printf(" > download complete.\n");
   if (retriever) {
     const QString parent = QFileInfo(retriever->mDestination).baseName();
     recursiveProtoRetrieval(retriever->mDestination, parent);
