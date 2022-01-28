@@ -68,7 +68,8 @@ WbProtoList::WbProtoList(const QString &path) {
   // open path (world), retrieve extern, kickoff download (separate recursive function)
   mDownloadingFiles = 0;
 
-  downloadExternProto(path, QString());
+  mWorldName = path;
+  downloadExternProto(path, WbStandardPaths::webotsTmpProtoPath());
 
   // recursivelyRetrieveExternProto(path, QString());
   // while (mDownloadingFiles > 0)
@@ -418,9 +419,9 @@ void WbProtoList::recursiveProtoRetrieval(const QString &filename, const QString
 
   for (int i = 0; i < externProtos.size(); ++i) {
     // create folder
-    QString rootPath = WbStandardPaths::webotsTmpProtoPath();
-    if (!parent.isEmpty())
-      rootPath += parent + "/";
+    QString rootPath = parent;
+    if (!parent.endsWith("/"))
+      rootPath += "/";
     rootPath += externProtos[i].first + "/";
 
     QFileInfo protoFile(rootPath + externProtos[i].first + ".proto");
@@ -429,9 +430,10 @@ void WbProtoList::recursiveProtoRetrieval(const QString &filename, const QString
     printf(" > making dir %s\n", protoFile.absolutePath().toUtf8().constData());
 
     // download
-    printf(" > downloading: %s to %s\n", externProtos[i].first.toUtf8().constData(), protoFile.filePath().toUtf8().constData());
+    printf(" > downloading: %s to %s\n", externProtos[i].first.toUtf8().constData(),
+           protoFile.absoluteFilePath().toUtf8().constData());
     mRetrievers.push_back(new WbDownloader(this));
-    mRetrievers.last()->download(QUrl(externProtos[i].second), protoFile.filePath());
+    mRetrievers.last()->download(QUrl(externProtos[i].second), protoFile.absoluteFilePath());
     mToRetrieve++;
     connect(mRetrievers.last(), &WbDownloader::complete, this, &WbProtoList::recurser);
   }
@@ -441,7 +443,8 @@ void WbProtoList::recurser() {
   WbDownloader *retriever = dynamic_cast<WbDownloader *>(sender());
   printf(" > download complete.\n");
   if (retriever) {
-    const QString parent = QFileInfo(retriever->mDestination).baseName();
+    const QString parent = QFileInfo(retriever->mDestination).absolutePath();
+    printf("   : %s\n", parent.toUtf8().constData());
     recursiveProtoRetrieval(retriever->mDestination, parent);
     emit retrieved();
   }

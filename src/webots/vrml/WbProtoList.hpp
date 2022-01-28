@@ -111,6 +111,7 @@ private:
 
   QVector<WbDownloader *> mRetrievers;
   int mToRetrieve;
+  QString mWorldName;
 
   static void updateProjectsProtoCache();
   static void updateResourcesProtoCache();
