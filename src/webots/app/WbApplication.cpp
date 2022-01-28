@@ -55,7 +55,7 @@ WbApplication::WbApplication() {
   // in order to be sure that the Qt internal files will be stored
   // at the right place
   WbStandardPaths::webotsTmpPath();
-  WbStandardPaths::webotsTmpProtoPath();  // TODO: mkdir ...
+  // WbStandardPaths::webotsTmpProtoPath();  // TODO: mkdir ...
 
   WbPreferences::createInstance("Cyberbotics", "Webots", WbApplicationInfo::version());
 

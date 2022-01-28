@@ -45,7 +45,7 @@ public:
   // create a proto list with a .proto file search path
   // the path will be searched recursively
   // explicit WbProtoList(const QString &primarySearchPath = "");
-  explicit WbProtoList(const QString &path);
+  explicit WbProtoList(const QString &world, bool reloading = false);
 
   // destroys the list and all the contained models
   ~WbProtoList();
@@ -110,8 +110,8 @@ private:
   WbDownloader *mDownloader;
 
   QVector<WbDownloader *> mRetrievers;
-  int mToRetrieve;
-  QString mWorldName;
+  QString mCurrentWorld;
+  bool mReloading;
 
   static void updateProjectsProtoCache();
   static void updateResourcesProtoCache();

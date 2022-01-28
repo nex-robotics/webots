@@ -45,6 +45,7 @@ WbDownloader::WbDownloader(QObject *parent) :
   QObject(parent),
   mNetworkReply(NULL),
   mFinished(false),
+  mCompleted(false),
   mOffline(false),
   mCopy(false),
   mIsBackground(false),

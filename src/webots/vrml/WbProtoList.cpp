@@ -14,6 +14,7 @@
 
 #include "WbProtoList.hpp"
 
+#include "../app/WbApplication.hpp"
 #include "../nodes/utils/WbDownloader.hpp"
 #include "WbLog.hpp"
 #include "WbNode.hpp"
@@ -56,24 +57,19 @@ WbProtoList::WbProtoList(const QString &primarySearchPath) {
 }
 */
 
-WbProtoList::WbProtoList(const QString &path) {
+WbProtoList::WbProtoList(const QString &world, bool releading) {
   printf("WbProtoList::WbProtoList()\n");
-  // if first call, open all worlds in projects folder and do shallow retrieval
-  static bool firstCall = true;
-  if (firstCall) {
-    mDownloader = NULL;
-    firstCall = false;
-  }
 
-  // open path (world), retrieve extern, kickoff download (separate recursive function)
-  mDownloadingFiles = 0;
+  // create protos folder in temporary directory, it will hold all extern references
+  QDir dir(WbStandardPaths::webotsTmpProtoPath());
+  if (dir.exists())
+    printf("Shouldn't be calling this if it already exists");  // TODO: check
+  else
+    dir.mkpath();
 
-  mWorldName = path;
+  mCurrentWorld = world;
+  mReloading = reloading;
   downloadExternProto(path, WbStandardPaths::webotsTmpProtoPath());
-
-  // recursivelyRetrieveExternProto(path, QString());
-  // while (mDownloadingFiles > 0)
-  //  std::this_thread::sleep_for(std::chrono::microseconds(100));
 }
 
 // we do not delete the PROTO models here: each PROTO model is automatically deleted when its last PROTO instance is deleted
@@ -451,10 +447,17 @@ void WbProtoList::recurser() {
 }
 
 void WbProtoList::tracker() {
-  mToRetrieve--;
+  bool finished = true;
+  for (int i = 0; i < mRetrievers.size(); ++i)
+    if (!mRetrievers[i].hasFinished())
+      finished = false;
 
-  if (mToRetrieve == 0) {
+  if (finished) {
     printf("FINISHED\n");
     disconnect(this, &WbProtoList::retrieved, this, &WbProtoList::tracker);
+    qDeleteAll(mRetrievers);
+    mRetrievers.clear();
+    // load the world again
+    WbApplication::instance()->loadWorld(mCurrentWorld, mReloading)
   }
 }
