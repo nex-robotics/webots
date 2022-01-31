@@ -43,13 +43,12 @@ void WbDownloader::reset() {
 
 WbDownloader::WbDownloader(QObject *parent) :
   QObject(parent),
+  mDestination(QString()),
   mNetworkReply(NULL),
   mFinished(false),
-  mCompleted(false),
   mOffline(false),
   mCopy(false),
-  mIsBackground(false),
-  mDestination(QString()) {
+  mIsBackground(false) {
   gCount++;
 }
 

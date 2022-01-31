@@ -99,7 +99,7 @@ void WbSingleTaskApplication::convertProto() const {
   }
 
   // Parse PROTO
-  new WbProtoList(QFileInfo(inputFile).absoluteDir().path());
+  // new WbProtoList(QFileInfo(inputFile).absoluteDir().path()); // TODO:TO RESTORE
   WbNode::setInstantiateMode(false);
   printf("convert proto\n");
   WbProtoModel *model = WbProtoList::current()->readModel(inputFile, "");
@@ -243,6 +243,8 @@ void WbSingleTaskApplication::showSysInfo() const {
 }
 
 void WbSingleTaskApplication::updateProtoCacheFiles() const {
+  // TODO: to restore/delete
+  /*
   const QString path = (mTaskArguments.size() > 0) ? mTaskArguments[0] : "";
   QFileInfo argumentInfo(path);
   if (argumentInfo.isFile()) {
@@ -273,4 +275,5 @@ void WbSingleTaskApplication::updateProtoCacheFiles() const {
   // recompute PROTO cache information
   foreach (QFileInfo protoInfo, protoList)
     WbProtoCachedInfo::computeInfo(protoInfo.absoluteFilePath());
+  */
 }

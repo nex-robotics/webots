@@ -260,12 +260,16 @@ bool WbApplication::isValidWorldFileName(const QString &worldName) {
 }
 
 bool WbApplication::loadWorld(QString worldName, bool reloading) {
+  if (!WbProtoList::current()->areProtoAssetsAvailable()) {
+    WbProtoList::current()->downloadExternProto(worldName, reloading);
+  }
+
   mWorldLoadingCanceled = false;
   mWorldLoadingProgressDialogCreated = false;
 
-  const QString &tmpProtoDirectory = WbStandardPaths::webotsTmpProtoPath();
-  if (QDir(tmpProtoDirectory).removeRecursively())
-    QDir().mkdir(tmpProtoDirectory);
+  // const QString &tmpProtoDirectory = WbStandardPaths::webotsTmpProtoPath();
+  // if (QDir(tmpProtoDirectory).removeRecursively())
+  //  QDir().mkdir(tmpProtoDirectory);
 
   WbNodeOperations::instance()->enableSolidNameClashCheckOnNodeRegeneration(false);
 
@@ -287,7 +291,8 @@ bool WbApplication::loadWorld(QString worldName, bool reloading) {
 
   bool isValidProject = true;
   QString newProjectPath = WbProject::projectPathFromWorldFile(worldName, isValidProject);
-  WbProtoList *protoList = new WbProtoList(worldName);  // isValidProject ? newProjectPath + "protos" : ""
+  // WbProtoList *protoList = new WbProtoList(worldName);  // isValidProject ? newProjectPath + "protos" : ""
+  WbProtoList *protoList = WbProtoList::current();
 
   WbTokenizer tokenizer;
   int errors = tokenizer.tokenize(worldName);

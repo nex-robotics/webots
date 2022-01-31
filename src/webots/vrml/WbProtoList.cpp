@@ -57,20 +57,36 @@ WbProtoList::WbProtoList(const QString &primarySearchPath) {
 }
 */
 
-WbProtoList::WbProtoList(const QString &world, bool releading) {
+WbProtoList::WbProtoList() {
+  gCurrent = this;
+}
+
+bool WbProtoList::areProtoAssetsAvailable() {
+  if (QDir(WbStandardPaths::webotsTmpProtoPath()).exists()) {
+    printf("> proto assets available, world can be parsed\n");
+    return true;
+  }
+
+  printf("> proto assets not available, begin download\n");
+  return false;
+}
+
+/*
+WbProtoList::WbProtoList(const QString &world, bool reloading) {
   printf("WbProtoList::WbProtoList()\n");
 
   // create protos folder in temporary directory, it will hold all extern references
-  QDir dir(WbStandardPaths::webotsTmpProtoPath());
-  if (dir.exists())
-    printf("Shouldn't be calling this if it already exists");  // TODO: check
-  else
-    dir.mkpath();
+  // QDir dir();
+  // if (QDir(WbStandardPaths::webotsTmpProtoPath()).exists())
+  //  printf("Shouldn't be calling this if it already exists");  // TODO: check
+  // else
+  //  QDir().mkpath(WbStandardPaths::webotsTmpProtoPath());
 
   mCurrentWorld = world;
   mReloading = reloading;
-  downloadExternProto(path, WbStandardPaths::webotsTmpProtoPath());
+  downloadExternProto(world, WbStandardPaths::webotsTmpProtoPath());
 }
+*/
 
 // we do not delete the PROTO models here: each PROTO model is automatically deleted when its last PROTO instance is deleted
 WbProtoList::~WbProtoList() {
@@ -369,13 +385,22 @@ void WbProtoList::protoRetrieved() {
 
 // logic
 
-void WbProtoList::downloadExternProto(const QString &filename, const QString &parent) {
-  qDeleteAll(mRetrievers);
-  mRetrievers.clear();
-  mToRetrieve = 0;
+void WbProtoList::downloadExternProto(const QString &filename, bool reloading) {
+  // qDeleteAll(mRetrievers);
+  // mRetrievers.clear();
+  printf("a\n");
+  if (QDir(WbStandardPaths::webotsTmpProtoPath()).exists())
+    printf("Shouldn't be calling the download if it already exists");  // TODO: tmp safety check
+  else
+    QDir().mkpath(WbStandardPaths::webotsTmpProtoPath());
+  printf("b\n");
 
-  connect(this, &WbProtoList::retrieved, this, &WbProtoList::tracker);
-  recursiveProtoRetrieval(filename, parent);
+  mCurrentWorld = filename;
+  mReloading = reloading;
+  connect(this, &WbProtoList::retrieved, this, &WbProtoList::completionTracker);
+
+  printf("c\n");
+  recursiveProtoRetrieval(filename, WbStandardPaths::webotsTmpProtoPath());
 }
 
 QVector<QPair<QString, QString>> WbProtoList::getExternProto(const QString &filename) {
@@ -430,7 +455,6 @@ void WbProtoList::recursiveProtoRetrieval(const QString &filename, const QString
            protoFile.absoluteFilePath().toUtf8().constData());
     mRetrievers.push_back(new WbDownloader(this));
     mRetrievers.last()->download(QUrl(externProtos[i].second), protoFile.absoluteFilePath());
-    mToRetrieve++;
     connect(mRetrievers.last(), &WbDownloader::complete, this, &WbProtoList::recurser);
   }
 }
@@ -446,18 +470,18 @@ void WbProtoList::recurser() {
   }
 }
 
-void WbProtoList::tracker() {
+void WbProtoList::completionTracker() {
   bool finished = true;
   for (int i = 0; i < mRetrievers.size(); ++i)
-    if (!mRetrievers[i].hasFinished())
+    if (!mRetrievers[i]->hasFinished())
       finished = false;
 
   if (finished) {
     printf("FINISHED\n");
-    disconnect(this, &WbProtoList::retrieved, this, &WbProtoList::tracker);
+    disconnect(this, &WbProtoList::retrieved, this, &WbProtoList::completionTracker);
     qDeleteAll(mRetrievers);
     mRetrievers.clear();
     // load the world again
-    WbApplication::instance()->loadWorld(mCurrentWorld, mReloading)
+    WbApplication::instance()->loadWorld(mCurrentWorld, mReloading);
   }
 }

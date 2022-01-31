@@ -116,7 +116,7 @@ WbWorld::WbWorld(WbProtoList *protos, WbTokenizer *tokenizer) :
 
     // WbApplication::instance()->setWorldLoadingStatus(tr("Retrieving extern proto (if any)"));
     // recursivelyRetrieveExternReferences(mFileName, QString());
-    mProtos = protos ? protos : new WbProtoList(mFileName);
+    mProtos = NULL;  // protos ? protos : new WbProtoList(mFileName); // TODO: TO RESTORE
 
     // read/create nodes
     WbNodeReader reader;
@@ -263,7 +263,7 @@ bool WbWorld::saveAs(const QString &fileName) {
   if (newProjectPath != WbProject::current()->path()) {
     // reset list of loaded and available PROTO nodes
     delete mProtos;
-    mProtos = new WbProtoList(isValidProject ? newProjectPath + "protos" : "");
+    mProtos = WbProtoList::current();  // (isValidProject ? newProjectPath + "protos" : "");
     WbProject::current()->setPath(newProjectPath);
   }
 

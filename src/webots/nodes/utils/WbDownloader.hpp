@@ -46,8 +46,8 @@ private:
   QUrl mUrl;
   QNetworkReply *mNetworkReply;
   bool mFinished;
-  QString mError;
   bool mOffline;
+  QString mError;
   bool mCopy;
   bool mIsBackground;
 

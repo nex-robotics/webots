@@ -45,7 +45,10 @@ public:
   // create a proto list with a .proto file search path
   // the path will be searched recursively
   // explicit WbProtoList(const QString &primarySearchPath = "");
-  explicit WbProtoList(const QString &world, bool reloading = false);
+  // explicit WbProtoList(const QString &world, bool reloading = false);
+  WbProtoList();
+
+  bool areProtoAssetsAvailable();
 
   // destroys the list and all the contained models
   ~WbProtoList();
@@ -83,7 +86,7 @@ public:
 
   QVector<QPair<QString, QString>> getExternProto(const QString &filename);
   void recursiveProtoRetrieval(const QString &filename, const QString &parent);
-  void downloadExternProto(const QString &filename, const QString &parent);
+  void downloadExternProto(const QString &filename, bool reloading);
 
 signals:
   void retrieved();
@@ -91,7 +94,7 @@ signals:
 private slots:
   void protoRetrieved();
   void recurser();
-  void tracker();
+  void completionTracker();
 
 private:
   // cppcheck-suppress unknownMacro
