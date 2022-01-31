@@ -4,7 +4,7 @@
 EXTERNPROTO ExternalGeometry "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/TEST/protos/ExternalGeometry.proto"
 EXTERNPROTO ExternalAppearance "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/TEST/protos/ExternalAppearance.proto"
 
-PROTO ProtoShape [
+PROTO ExternalProtoShape [
 
 ]
 {
