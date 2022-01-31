@@ -442,6 +442,11 @@ void WbProtoList::recursiveProtoRetrieval(const QString &filename, const QString
   printf("recursing on: %s with parent >%s<\n", filename.toUtf8().constData(), parent.toUtf8().constData());
   QVector<QPair<QString, QString>> externProtos = getExternProto(filename);
 
+  if (externProtos.size() == 0) {
+    WbApplication::instance()->loadWorld(mCurrentWorld, mReloading);
+    return;
+  }
+
   for (int i = 0; i < externProtos.size(); ++i) {
     // create folder
     QString rootPath = parent;
