@@ -259,11 +259,16 @@ bool WbApplication::isValidWorldFileName(const QString &worldName) {
   return true;
 }
 
-bool WbApplication::loadWorld(QString worldName, bool reloading) {
-  printf("WbApplication::loadWorld()\n");
+void WbApplication::preloadWorldAssets(QString worldName, bool reloading) {
+  printf("WbApplication::preloadWorldAssets()\n");
   if (!WbProtoList::current()->areProtoAssetsAvailable()) {
     WbProtoList::current()->downloadExternProto(worldName, reloading);
-  }
+  } else
+    loadWorld(worldName, reloading);
+}
+
+bool WbApplication::loadWorld(QString worldName, bool reloading) {
+  printf("WbApplication::loadWorld()\n");
 
   mWorldLoadingCanceled = false;
   mWorldLoadingProgressDialogCreated = false;
