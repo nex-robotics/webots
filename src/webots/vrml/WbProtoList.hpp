@@ -86,7 +86,7 @@ public:
 
   QVector<QPair<QString, QString>> getExternProto(const QString &filename);
   void recursiveProtoRetrieval(const QString &filename, const QString &parent);
-  void downloadExternProto(const QString &filename, bool reloading);
+  void downloadExternProto(QString filename, bool reloading);
 
 signals:
   void retrieved();

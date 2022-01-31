@@ -260,6 +260,7 @@ bool WbApplication::isValidWorldFileName(const QString &worldName) {
 }
 
 bool WbApplication::loadWorld(QString worldName, bool reloading) {
+  printf("WbApplication::loadWorld()\n");
   if (!WbProtoList::current()->areProtoAssetsAvailable()) {
     WbProtoList::current()->downloadExternProto(worldName, reloading);
   }

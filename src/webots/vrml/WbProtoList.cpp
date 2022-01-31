@@ -28,15 +28,15 @@
 #include <QtCore/QDir>
 #include <QtCore/QDirIterator>
 #include <QtCore/QRegularExpression>
-#include <chrono>
-#include <thread>
 
-WbProtoList *gCurrent = NULL;
+static WbProtoList *gCurrent = NULL;
 QFileInfoList WbProtoList::gResourcesProtoCache;
 QFileInfoList WbProtoList::gProjectsProtoCache;
 QFileInfoList WbProtoList::gExtraProtoCache;
 
 WbProtoList *WbProtoList::current() {
+  if (!gCurrent)
+    gCurrent = new WbProtoList();
   return gCurrent;
 }
 
@@ -58,7 +58,6 @@ WbProtoList::WbProtoList(const QString &primarySearchPath) {
 */
 
 WbProtoList::WbProtoList() {
-  gCurrent = this;
 }
 
 bool WbProtoList::areProtoAssetsAvailable() {
@@ -169,17 +168,22 @@ void WbProtoList::updatePrimaryProtoCache() {
 }
 
 WbProtoModel *WbProtoList::readModel(const QString &fileName, const QString &worldPath, QStringList baseTypeList) const {
+  printf("WbProtoList::readModel(arg string)\n");
   WbTokenizer tokenizer;
   int errors = tokenizer.tokenize(fileName);
   if (errors > 0)
     return NULL;
 
   // TODO: should be moved elsewhere (WbParser), as this point might be reached while parsing a world too
-  printf("readmodel (next word is %s)\n", tokenizer.peekWord().toUtf8().constData());
   WbParser parser(&tokenizer);
 
-  // if (!parser.parseProtoInterface(worldPath))
-  //  return NULL;
+  while (tokenizer.peekWord() == "EXTERNPROTO")  // consume all EXTERNPROTO tokens, if any
+    parser.skipExternProto();
+
+  if (!parser.parseProtoInterface(worldPath))
+    return NULL;
+
+  printf("readmodel (next word is %s)\n", tokenizer.peekWord().toUtf8().constData());
 
   tokenizer.rewind();
   bool prevInstantiateMode = WbNode::instantiateMode();
@@ -195,6 +199,7 @@ WbProtoModel *WbProtoList::readModel(const QString &fileName, const QString &wor
 }
 
 void WbProtoList::readModel(WbTokenizer *tokenizer, const QString &worldPath) {
+  printf("WbProtoList::readModel (arg tokenizer)\n");
   WbProtoModel *model = NULL;
   bool prevInstantiateMode = WbNode::instantiateMode();
   try {
@@ -211,14 +216,13 @@ void WbProtoList::readModel(WbTokenizer *tokenizer, const QString &worldPath) {
 
 WbProtoModel *WbProtoList::customFindModel(const QString &modelName, const QString &worldPath, QStringList baseTypeList) {
   printf("WbProtoList::customFindModel\n");
-  return NULL;
+  // return NULL;
 
   foreach (WbProtoModel *model, mModels)
     if (model->name() == modelName)
       return model;
 
   QFileInfoList tmpProto;
-
   QDirIterator it(WbStandardPaths::webotsTmpProtoPath(), QStringList("*.proto"), QDir::Files, QDirIterator::Subdirectories);
   while (it.hasNext()) {
     QFileInfo fi(it.next());
@@ -385,21 +389,17 @@ void WbProtoList::protoRetrieved() {
 
 // logic
 
-void WbProtoList::downloadExternProto(const QString &filename, bool reloading) {
+void WbProtoList::downloadExternProto(QString filename, bool reloading) {
   // qDeleteAll(mRetrievers);
   // mRetrievers.clear();
-  printf("a\n");
   if (QDir(WbStandardPaths::webotsTmpProtoPath()).exists())
     printf("Shouldn't be calling the download if it already exists");  // TODO: tmp safety check
   else
     QDir().mkpath(WbStandardPaths::webotsTmpProtoPath());
-  printf("b\n");
 
   mCurrentWorld = filename;
   mReloading = reloading;
   connect(this, &WbProtoList::retrieved, this, &WbProtoList::completionTracker);
-
-  printf("c\n");
   recursiveProtoRetrieval(filename, WbStandardPaths::webotsTmpProtoPath());
 }
 
@@ -477,7 +477,7 @@ void WbProtoList::completionTracker() {
       finished = false;
 
   if (finished) {
-    printf("FINISHED\n");
+    printf("FINISHED, files downloaded: %d\n", mRetrievers.size());
     disconnect(this, &WbProtoList::retrieved, this, &WbProtoList::completionTracker);
     qDeleteAll(mRetrievers);
     mRetrievers.clear();
