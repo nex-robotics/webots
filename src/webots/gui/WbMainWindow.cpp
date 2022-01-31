@@ -1317,7 +1317,8 @@ bool WbMainWindow::loadWorld(const QString &fileName, bool reloading) {
   mSimulationView->cancelSupervisorMovieRecording();
   logActiveControllersTermination();
   WbLog::setConsoleLogsPostponed(true);
-  WbApplication::instance()->preloadWorldAssets(fileName, reloading);
+  WbApplication::instance()->loadWorld(fileName, reloading);
+
   // if (!success) {
   //  WbLog::setConsoleLogsPostponed(false);
   //  WbLog::showPendingConsoleMessages();

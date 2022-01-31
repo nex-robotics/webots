@@ -70,7 +70,7 @@ WbNode *WbNodeReader::createNode(const QString &modelName, WbTokenizer *tokenize
 }
 
 WbNode *WbNodeReader::readNode(WbTokenizer *tokenizer, const QString &worldPath) {
-  printf("WbNodeReader::readNode: %s\n", tokenizer->peekWord().toUtf8().constData());
+  // printf("WbNodeReader::readNode: %s\n", tokenizer->peekWord().toUtf8().constData());
 
   if (tokenizer->peekWord() == "NULL") {
     tokenizer->skipToken("NULL");
