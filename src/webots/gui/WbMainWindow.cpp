@@ -1430,6 +1430,8 @@ void WbMainWindow::newWorld() {
 }
 
 void WbMainWindow::openWorld() {
+  printf("WbMainWindow::openWorld()\n");
+
   WbSimulationState *simulationState = WbSimulationState::instance();
   simulationState->pauseSimulation();
 

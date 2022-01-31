@@ -60,14 +60,19 @@ WbProtoList::WbProtoList(const QString &primarySearchPath) {
 WbProtoList::WbProtoList() {
 }
 
-bool WbProtoList::areProtoAssetsAvailable() {
-  if (QDir(WbStandardPaths::webotsTmpProtoPath()).exists()) {
-    printf("> proto assets available, world can be parsed\n");
-    return true;
+bool WbProtoList::areProtoAssetsAvailable(const QString &filename) {
+  QVector<QPair<QString, QString>> externProtos = getExternProto(filename);
+
+  for (int i = 0; i < externProtos.size(); ++i) {  // TODO: need to check full depth or just at world level?
+    const QString path = WbStandardPaths::webotsTmpProtoPath() + externProtos[i].first + "/" + externProtos[i].first + ".proto";
+    if (!QFileInfo(path).exists()) {
+      printf("> proto assets not available, begin download\n");
+      return false;
+    }
   }
 
-  printf("> proto assets not available, begin download\n");
-  return false;
+  printf("> proto assets available, world can be parsed\n");
+  return true;
 }
 
 /*
@@ -396,10 +401,11 @@ void WbProtoList::protoRetrieved() {
 void WbProtoList::downloadExternProto(QString filename, bool reloading) {
   // qDeleteAll(mRetrievers);
   // mRetrievers.clear();
-  if (QDir(WbStandardPaths::webotsTmpProtoPath()).exists())
-    printf("Shouldn't be calling the download if it already exists");  // TODO: tmp safety check
-  else
-    QDir().mkpath(WbStandardPaths::webotsTmpProtoPath());
+  QDir tmpProtoDir(WbStandardPaths::webotsTmpProtoPath());
+  if (tmpProtoDir.exists())
+    tmpProtoDir.removeRecursively();
+
+  QDir().mkpath(WbStandardPaths::webotsTmpProtoPath());
 
   mCurrentWorld = filename;
   mReloading = reloading;

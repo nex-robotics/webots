@@ -200,12 +200,17 @@ void WbWorld::finalize() {
 }
 
 WbWorld::~WbWorld() {
+  printf("~WbWorld()\n");
   delete mRoot;
   delete mProtos;
   WbNode::cleanup();
   gInstance = NULL;
 
   delete mPerspective;
+
+  // TODO: pointless, occurs too late
+  // QDir tmpProtoDir(WbStandardPaths::webotsTmpProtoPath());
+  // tmpProtoDir.removeRecursively();
 
   WbWrenOpenGlContext::makeWrenCurrent();
   // Sanity-check: make sure only the root wren::Transform remains
