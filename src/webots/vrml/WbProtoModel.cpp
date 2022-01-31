@@ -104,7 +104,6 @@ WbProtoModel::WbProtoModel(WbTokenizer *tokenizer, const QString &worldPath, con
     QFileInfo fi(fileName);
 
     // proto name and proto file name have to match
-    printf("BASENAME CHECK: %s vs %s\n", fi.baseName().toUtf8().constData(), mName.toUtf8().constData());
     if (fi.baseName() != mName) {
       tokenizer->reportFileError(tr("'%1' PROTO identifier does not match filename").arg(mName));
       throw 0;
@@ -335,6 +334,7 @@ WbProtoModel::WbProtoModel(WbTokenizer *tokenizer, const QString &worldPath, con
       mDocumentationUrl =
         QString("%1/doc/%2/%3").arg(WbStandardPaths::cyberboticsUrl()).arg(bookAndPage[0]).arg(bookAndPage[1]);
   }
+  printf("WbProtoModel done\n");
 }
 
 WbProtoModel::~WbProtoModel() {

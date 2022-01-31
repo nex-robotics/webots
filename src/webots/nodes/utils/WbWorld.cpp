@@ -412,6 +412,7 @@ WbNode *WbWorld::findTopLevelNode(const QString &modelName, int preferredPositio
 }
 
 void WbWorld::checkPresenceOfMandatoryNodes() {
+  printf("checkPresenceOfMandatoryNodes()\n");
   mWorldInfo = static_cast<WbWorldInfo *>(findTopLevelNode("WorldInfo", 0));
   if (!mWorldInfo) {
     mWorldInfo = new WbWorldInfo();

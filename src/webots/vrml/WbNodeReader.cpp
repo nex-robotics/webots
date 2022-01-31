@@ -70,6 +70,8 @@ WbNode *WbNodeReader::createNode(const QString &modelName, WbTokenizer *tokenize
 }
 
 WbNode *WbNodeReader::readNode(WbTokenizer *tokenizer, const QString &worldPath) {
+  printf("WbNodeReader::readNode: %s\n", tokenizer->peekWord().toUtf8().constData());
+
   if (tokenizer->peekWord() == "NULL") {
     tokenizer->skipToken("NULL");
     return NULL;
@@ -121,6 +123,12 @@ WbNode *WbNodeReader::readNode(WbTokenizer *tokenizer, const QString &worldPath)
 
 QList<WbNode *> WbNodeReader::readNodes(WbTokenizer *tokenizer, const QString &worldPath) {
   tokenizer->rewind();
+
+  // TODO: find other way of skipping externproto here (in rewind? in tokenizer? static method in parser?)
+  WbParser parser(tokenizer);
+  while (tokenizer->peekWord() == "EXTERNPROTO")  // consume all EXTERNPROTO tokens, they are retrieved separately
+    parser.skipExternProto();
+
   QList<WbNode *> nodes;
   while (!tokenizer->peekToken()->isEof()) {
     emit readNodesHasProgressed(100 * tokenizer->pos() / tokenizer->totalTokensNumber());

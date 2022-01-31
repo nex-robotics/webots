@@ -111,6 +111,8 @@ WbConcreteNodeFactory WbConcreteNodeFactory::gFactory;
 
 WbNode *WbConcreteNodeFactory::createNode(const QString &modelName, WbTokenizer *tokenizer, WbNode *parentNode,
                                           const QString *protoFilePath) {
+  printf("Concrete node factory %s\n", modelName.toUtf8().constData());
+
   if (modelName == "Accelerometer")
     return new WbAccelerometer(tokenizer);
   if (modelName == "Altimeter")
@@ -283,7 +285,6 @@ WbNode *WbConcreteNodeFactory::createNode(const QString &modelName, WbTokenizer 
     return new WbZoom(tokenizer);
 
   // look for PROTOs
-  printf("Concrete node factory \n");
   WbProtoModel *const model =
     protoFilePath ?
       WbProtoList::current()->readModel(*protoFilePath, WbWorld::instance() ? WbWorld::instance()->fileName() : "") :

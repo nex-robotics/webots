@@ -186,6 +186,10 @@ WbProtoModel *WbProtoList::readModel(const QString &fileName, const QString &wor
   printf("readmodel (next word is %s)\n", tokenizer.peekWord().toUtf8().constData());
 
   tokenizer.rewind();
+
+  while (tokenizer.peekWord() == "EXTERNPROTO")  // consume all EXTERNPROTO tokens, if any
+    parser.skipExternProto();
+
   bool prevInstantiateMode = WbNode::instantiateMode();
   try {
     WbNode::setInstantiateMode(false);
