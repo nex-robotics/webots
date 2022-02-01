@@ -169,10 +169,18 @@ void WbDownloader::finished() {
 
   if (mUrl.toString().endsWith(".proto", Qt::CaseInsensitive) && !mDestination.isEmpty()) {
     QFile file(mDestination);
-    if (!file.open(QIODevice::WriteOnly))
+    if (file.open(QIODevice::WriteOnly)) {
+      // assert(mNetworkReply != NULL);
+      if (mNetworkReply) {
+        file.write(mNetworkReply->readAll());
+      } else {
+        QNetworkReply *reply = gUrlCache[mUrl];  // cached already
+        assert(reply != NULL);
+        file.write(reply->readAll());
+      }
+      file.close();
+    } else
       mError = tr("Couldn't write %1 to disk.\n").arg(mDestination);
-    file.write(mNetworkReply->readAll());
-    file.close();
   }
 
   gComplete++;

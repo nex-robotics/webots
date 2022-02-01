@@ -392,6 +392,8 @@ void WbProtoList::recursiveProtoRetrieval(const QString &filename, const QString
   printf("  found %d\n", externProtos.size());
   if (externProtos.isEmpty()) {
     // WbApplication::instance()->loadWorld(mCurrentWorld, mReloading);
+    emit protoRetrieved();
+
     return;  // nothing else to recurse into, or no extern proto to begin with
   }
 
@@ -424,7 +426,6 @@ void WbProtoList::recurser() {
   if (retriever) {
     const QString parent = QFileInfo(retriever->mDestination).absolutePath();
     recursiveProtoRetrieval(retriever->mDestination, parent);
-    emit protoRetrieved();
   }
 }
 
@@ -445,10 +446,10 @@ void WbProtoList::retrievalCompletionTracker() {
 }
 
 void WbProtoList::setupKnownProtoList() {
-  QDir searchPath("/home/daniel/webots_develop/projects/samples/devices/worlds");
+  QDir searchPath("/home/nctrl/webots_develop/projects/samples/devices/worlds");
 
   if (!searchPath.exists() || !searchPath.isReadable())
-    printf("> path doesn't exist");  // TODO: handle this case
+    printf("> ERROR: path doesn't exist\n");  // TODO: handle this case
 
   QFileInfoList worlds;
   QStringList filter("*.wbt");
