@@ -391,8 +391,9 @@ void WbProtoList::recursiveProtoRetrieval(const QString &filename, const QString
   QMap<QString, QString> externProtos = getExternProtoList(filename);
 
   if (externProtos.isEmpty()) {
-    WbApplication::instance()->loadWorld(mCurrentWorld, mReloading);
-    return;
+    return;  // nothing else to recurse into, or no extern proto to begin with
+    // WbApplication::instance()->loadWorld(mCurrentWorld, mReloading);
+    // return;
   }
 
   QMapIterator<QString, QString> it(externProtos);
@@ -420,7 +421,7 @@ void WbProtoList::recursiveProtoRetrieval(const QString &filename, const QString
 
 void WbProtoList::recurser() {
   WbDownloader *retriever = dynamic_cast<WbDownloader *>(sender());
-  printf(" > download complete.\n");
+  printf("   > download complete for %s.\n", retriever->mDestination.toUtf8().constData());
   if (retriever) {
     const QString parent = QFileInfo(retriever->mDestination).absolutePath();
     recursiveProtoRetrieval(retriever->mDestination, parent);
@@ -445,7 +446,6 @@ void WbProtoList::retrievalCompletionTracker() {
 }
 
 void WbProtoList::setupKnownProtoList() {
-  printf("-- known proto --\n");
   QDir searchPath("/home/daniel/webots_develop/projects/samples/devices/worlds");
 
   if (!searchPath.exists() || !searchPath.isReadable())
@@ -458,14 +458,18 @@ void WbProtoList::setupKnownProtoList() {
   foreach (const QFileInfo &world, worlds) {
     // printf("~~> %s\n", world.absoluteFilePath().toUtf8().constData());
     QMap<QString, QString> externProtos = getExternProtoList(world.absoluteFilePath());
+    // note: if externProtos contains a key that already exists in mProtoList, the latter is overwritten
     mProtoList.insert(externProtos);
-
-    QMapIterator<QString, QString> it(externProtos);
-    while (it.hasNext()) {
-      it.next();
-
-      printf("  %30s %s\n", it.key().toUtf8().constData(), it.value().toUtf8().constData());
-    }
   }
+
+  printf("-- known proto --\n");
+
+  QMapIterator<QString, QString> it(mProtoList);
+  while (it.hasNext()) {
+    it.next();
+
+    printf("  %30s %s\n", it.key().toUtf8().constData(), it.value().toUtf8().constData());
+  }
+
   printf("-- end known proto --\n");
 }
