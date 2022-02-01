@@ -1,13 +1,13 @@
 #VRML_SIM R2022b utf8
 
-EXTERNPROTO TexturedBackground "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/backgrounds/protos/TexturedBackground.proto"
-EXTERNPROTO TexturedBackgroundLight "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
-EXTERNPROTO RectangleArena "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/floors/protos/RectangleArena.proto"
-EXTERNPROTO BrushedSteel "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/appearances/protos/BrushedSteel.proto"
-EXTERNPROTO ThreadMetalPlate "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/appearances/protos/ThreadMetalPlate.proto"
-EXTERNPROTO MetalPipePaint "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/appearances/protos/MetalPipePaint.proto"
-EXTERNPROTO CorrodedMetal "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/appearances/protos/CorrodedMetal.proto"
-EXTERNPROTO GlossyPaint "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/appearances/protos/GlossyPaint.proto"
+EXTERNPROTO TexturedBackground "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO TexturedBackgroundLight "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO RectangleArena "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO BrushedSteel "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/appearances/protos/BrushedSteel.proto"
+EXTERNPROTO ThreadMetalPlate "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/appearances/protos/ThreadMetalPlate.proto"
+EXTERNPROTO MetalPipePaint "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/appearances/protos/MetalPipePaint.proto"
+EXTERNPROTO CorrodedMetal "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/appearances/protos/CorrodedMetal.proto"
+EXTERNPROTO GlossyPaint "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/appearances/protos/GlossyPaint.proto"
 
 WorldInfo {
   info [
