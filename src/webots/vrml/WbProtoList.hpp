@@ -85,7 +85,7 @@ public:
 
   void recursivelyRetrieveExternProto(const QString &filename, const QString &parent);
 
-  QVector<QPair<QString, QString>> getExternProtoList(const QString &filename);
+  QMap<QString, QString> getExternProtoList(const QString &filename);
   void recursiveProtoRetrieval(const QString &filename, const QString &parent);
   void retrieveExternProto(QString filename, bool reloading);
 
