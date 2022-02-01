@@ -389,11 +389,10 @@ QMap<QString, QString> WbProtoList::getExternProtoList(const QString &filename) 
 void WbProtoList::recursiveProtoRetrieval(const QString &filename, const QString &parent) {
   printf("recursing: %s, parent >%s<\n", filename.toUtf8().constData(), parent.toUtf8().constData());
   QMap<QString, QString> externProtos = getExternProtoList(filename);
-
+  printf("  found %d\n", externProtos.size());
   if (externProtos.isEmpty()) {
-    return;  // nothing else to recurse into, or no extern proto to begin with
     // WbApplication::instance()->loadWorld(mCurrentWorld, mReloading);
-    // return;
+    return;  // nothing else to recurse into, or no extern proto to begin with
   }
 
   QMapIterator<QString, QString> it(externProtos);

@@ -4,8 +4,11 @@
 # A configurable rectangle arena composed of a floor surrounded by walls.
 # template language: javascript
 
-EXTERNPROTO SolidBox "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/solids/protos/SolidBox.proto"
-EXTERNPROTO Floor "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO SolidBox "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/objects/solids/protos/SolidBox.proto"
+EXTERNPROTO Floor "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO BrushedAluminium "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/appearances/protos/BrushedAluminium.proto"
+EXTERNPROTO Parquetry "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/appearances/protos/Parquetry.proto"
+
 
 PROTO RectangleArena [
   field SFVec3f    translation     0 0 0

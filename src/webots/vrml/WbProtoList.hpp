@@ -123,7 +123,7 @@ private:
   static void updateExtraProtoCache();
   void updatePrimaryProtoCache();
 
-  void setupKnownProtoList();
+  void setupKnownProtoList();  // known == mentioned in a world file in the webots library (sub-proto not known)
 };
 
 #endif
