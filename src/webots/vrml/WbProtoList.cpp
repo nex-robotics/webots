@@ -58,21 +58,7 @@ WbProtoList::WbProtoList(const QString &primarySearchPath) {
 */
 
 WbProtoList::WbProtoList() {
-}
-
-bool WbProtoList::areProtoAssetsAvailable(const QString &filename) {
-  QVector<QPair<QString, QString>> externProtos = getExternProto(filename);
-
-  for (int i = 0; i < externProtos.size(); ++i) {  // TODO: need to check full depth or just at world level?
-    const QString path = WbStandardPaths::webotsTmpProtoPath() + externProtos[i].first + "/" + externProtos[i].first + ".proto";
-    if (!QFileInfo(path).exists()) {
-      printf("> proto assets not available, begin download\n");
-      return false;
-    }
-  }
-
-  printf("> proto assets available, world can be parsed\n");
-  return true;
+  setupKnownProtoList();
 }
 
 /*
@@ -340,80 +326,34 @@ void WbProtoList::insertProtoSearchPath(const QString &path) {
     printf("- %s\n", path.toUtf8().constData());
 }
 
-void WbProtoList::recursivelyRetrieveExternProto(const QString &filename, const QString &parent) {
-  QFile file(filename);
-  if (file.open(QIODevice::ReadOnly)) {
-    const QString content = file.readAll();
+bool WbProtoList::areProtoAssetsAvailable(const QString &filename) {
+  QVector<QPair<QString, QString>> externProtos = getExternProtoList(filename);
 
-    QRegularExpression re("EXTERNPROTO\\s([a-zA-Z0-9-_+]+)\\s\"(.*\\.proto)\"");  // TODO: test it more
-
-    QRegularExpressionMatchIterator it = re.globalMatch(content);
-    while (it.hasNext()) {
-      QRegularExpressionMatch match = it.next();
-      if (match.hasMatch()) {
-        const QString identifier = match.captured(1);
-        const QString url = match.captured(2);
-        if (!url.endsWith(identifier + ".proto")) {
-          WbLog::error(tr("Malformed extern proto url. The identifier and url do not coincide.\n"));
-          return;
-        }
-
-        printf("REGEX found >>%s<< >>%s<<\n", identifier.toUtf8().constData(), url.toUtf8().constData());
-
-        // create directory for this proto
-
-        QString rootPath = WbStandardPaths::webotsTmpProtoPath();
-        if (!parent.isEmpty())
-          rootPath += parent + "/";
-        rootPath += identifier + "/";
-
-        QFileInfo protoFile(rootPath + identifier + ".proto");
-
-        if (!protoFile.exists()) {
-          printf("> will download to: %s\n", identifier.toUtf8().constData());
-          QDir dir;
-          dir.mkpath(protoFile.absolutePath());
-          printf("making dir %s\n", protoFile.absolutePath().toUtf8().constData());
-
-          if (mDownloader != NULL && mDownloader->device() != NULL)
-            delete mDownloader;
-          mDownloader = new WbDownloader(this);
-          mDownloader->download(QUrl(url), protoFile.filePath());
-          mDownloadingFiles++;
-          connect(mDownloader, &WbDownloader::complete, this, &WbProtoList::protoRetrieved);
-        } else
-          printf("> %s already exists in tmp\n", identifier.toUtf8().constData());
-      }
+  for (int i = 0; i < externProtos.size(); ++i) {  // TODO: need to check full depth or just at world level?
+    const QString path = WbStandardPaths::webotsTmpProtoPath() + externProtos[i].first + "/" + externProtos[i].first + ".proto";
+    if (!QFileInfo(path).exists()) {
+      printf(" > proto assets not available, begin download\n");
+      return false;
     }
-  } else
-    WbLog::error(tr("Could not open file: '%1'.").arg(filename));
+  }
+
+  printf(" > proto assets available, world can be parsed\n");
+  return true;
 }
 
-void WbProtoList::protoRetrieved() {
-  printf("Download completed\n");
-  const QString parent = QFileInfo(mDownloader->mDestination).baseName();
-  // recursivelyRetrieveExternProto(mDownloader->mDestination, parent);
-  mDownloadingFiles--;
-}
-
-// logic
-
-void WbProtoList::downloadExternProto(QString filename, bool reloading) {
-  // qDeleteAll(mRetrievers);
-  // mRetrievers.clear();
-  QDir tmpProtoDir(WbStandardPaths::webotsTmpProtoPath());
-  if (tmpProtoDir.exists())
-    tmpProtoDir.removeRecursively();
-
+void WbProtoList::retrieveExternProto(QString filename, bool reloading) {
+  QDir temporaryProtoDir(WbStandardPaths::webotsTmpProtoPath());
+  if (temporaryProtoDir.exists())
+    temporaryProtoDir.removeRecursively();
   QDir().mkpath(WbStandardPaths::webotsTmpProtoPath());
 
   mCurrentWorld = filename;
   mReloading = reloading;
-  connect(this, &WbProtoList::retrieved, this, &WbProtoList::completionTracker);
-  recursiveProtoRetrieval(filename, WbStandardPaths::webotsTmpProtoPath());
+  connect(this, &WbProtoList::protoRetrieved, this, &WbProtoList::retrievalCompletionTracker);
+  recursiveProtoRetrieval(filename, temporaryProtoDir.absolutePath());
 }
 
-QVector<QPair<QString, QString>> WbProtoList::getExternProto(const QString &filename) {
+QVector<QPair<QString, QString>> WbProtoList::getExternProtoList(const QString &filename) {
   QVector<QPair<QString, QString>> list;
 
   QFile file(filename);
@@ -435,7 +375,7 @@ QVector<QPair<QString, QString>> WbProtoList::getExternProto(const QString &file
           return list;
         }
 
-        printf(" > found >>%s<< >>%s<<\n", pair.first.toUtf8().constData(), pair.second.toUtf8().constData());
+        printf(" > found |%s| |%s|\n", pair.first.toUtf8().constData(), pair.second.toUtf8().constData());
         list.push_back(pair);
       }
     }
@@ -445,8 +385,8 @@ QVector<QPair<QString, QString>> WbProtoList::getExternProto(const QString &file
 }
 
 void WbProtoList::recursiveProtoRetrieval(const QString &filename, const QString &parent) {
-  printf("recursing on: %s with parent >%s<\n", filename.toUtf8().constData(), parent.toUtf8().constData());
-  QVector<QPair<QString, QString>> externProtos = getExternProto(filename);
+  printf("recursing: %s, parent >%s<\n", filename.toUtf8().constData(), parent.toUtf8().constData());
+  QVector<QPair<QString, QString>> externProtos = getExternProtoList(filename);
 
   if (externProtos.size() == 0) {
     WbApplication::instance()->loadWorld(mCurrentWorld, mReloading);
@@ -454,7 +394,7 @@ void WbProtoList::recursiveProtoRetrieval(const QString &filename, const QString
   }
 
   for (int i = 0; i < externProtos.size(); ++i) {
-    // create folder
+    // create folder named as the identifier of the proto
     QString rootPath = parent;
     if (!parent.endsWith("/"))
       rootPath += "/";
@@ -479,13 +419,12 @@ void WbProtoList::recurser() {
   printf(" > download complete.\n");
   if (retriever) {
     const QString parent = QFileInfo(retriever->mDestination).absolutePath();
-    printf("   : %s\n", parent.toUtf8().constData());
     recursiveProtoRetrieval(retriever->mDestination, parent);
-    emit retrieved();
+    emit protoRetrieved();
   }
 }
 
-void WbProtoList::completionTracker() {
+void WbProtoList::retrievalCompletionTracker() {
   bool finished = true;
   for (int i = 0; i < mRetrievers.size(); ++i)
     if (!mRetrievers[i]->hasFinished())
@@ -493,10 +432,24 @@ void WbProtoList::completionTracker() {
 
   if (finished) {
     printf("FINISHED, files downloaded: %d\n", mRetrievers.size());
-    disconnect(this, &WbProtoList::retrieved, this, &WbProtoList::completionTracker);
+    disconnect(this, &WbProtoList::protoRetrieved, this, &WbProtoList::retrievalCompletionTracker);
     qDeleteAll(mRetrievers);
     mRetrievers.clear();
     // load the world again
     WbApplication::instance()->loadWorld(mCurrentWorld, mReloading);
   }
+}
+
+void WbProtoList::setupKnownProtoList() {
+  QDir searchPath("/home/daniel/webots_develop/projects/samples/devices/worlds");
+
+  if (!searchPath.exists() || !searchPath.isReadable())
+    printf("> path doesn't exist");  // TODO: handle this case
+
+  QFileInfoList worlds;
+  QStringList filter("*.wbt");
+  worlds.append(searchPath.entryInfoList(filter, QDir::Files, QDir::Name));
+
+  foreach (const QFileInfo &world, worlds) { printf("~~> %s\n", world.baseName().toUtf8().constData()); }
+  // QVector<QPair<QString, QString>> externProtos = getExternProtoList(filename);
 }

@@ -24,6 +24,7 @@ class WbTokenizer;
 class WbDownloader;
 
 #include <QtCore/QFileInfoList>
+#include <QtCore/QMap>
 #include <QtCore/QObject>
 #include <QtCore/QStringList>
 
@@ -84,17 +85,16 @@ public:
 
   void recursivelyRetrieveExternProto(const QString &filename, const QString &parent);
 
-  QVector<QPair<QString, QString>> getExternProto(const QString &filename);
+  QVector<QPair<QString, QString>> getExternProtoList(const QString &filename);
   void recursiveProtoRetrieval(const QString &filename, const QString &parent);
-  void downloadExternProto(QString filename, bool reloading);
+  void retrieveExternProto(QString filename, bool reloading);
 
 signals:
-  void retrieved();
+  void protoRetrieved();
 
 private slots:
-  void protoRetrieved();
   void recurser();
-  void completionTracker();
+  void retrievalCompletionTracker();
 
 private:
   // cppcheck-suppress unknownMacro
@@ -116,10 +116,14 @@ private:
   QString mCurrentWorld;
   bool mReloading;
 
+  QMap<QString, QString> mProtoList;
+
   static void updateProjectsProtoCache();
   static void updateResourcesProtoCache();
   static void updateExtraProtoCache();
   void updatePrimaryProtoCache();
+
+  void setupKnownProtoList();
 };
 
 #endif
