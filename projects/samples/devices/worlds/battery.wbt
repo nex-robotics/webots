@@ -1,7 +1,7 @@
 #VRML_SIM R2022b utf8
 
-EXTERNPROTO TexturedBackground https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/backgrounds/protos/TexturedBackground.proto
-EXTERNPROTO RectangleArena https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/floors/protos/RectangleArena.proto
+EXTERNPROTO TexturedBackground "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO RectangleArena "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/floors/protos/RectangleArena.proto"
 
 
 WorldInfo {

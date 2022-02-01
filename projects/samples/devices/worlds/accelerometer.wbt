@@ -1,10 +1,10 @@
 #VRML_SIM R2022b utf8
 
-EXTERNPROTO TexturedBackground https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/backgrounds/protos/TexturedBackground.proto
-EXTERNPROTO TexturedBackgroundLight https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto
-EXTERNPROTO RectangleArena https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/floors/protos/RectangleArena.proto
-EXTERNPROTO BrushedAluminium https://raw.githubusercontent.com/cyberbotics/webots/master/projects/appearances/protos/BrushedAluminium.proto
-EXTERNPROTO OsbWood https://github.com/cyberbotics/webots/blob/master/projects/appearances/protos/OsbWood.proto
+EXTERNPROTO TexturedBackground "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO TexturedBackgroundLight "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO RectangleArena "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO BrushedAluminium "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/appearances/protos/BrushedAluminium.proto"
+EXTERNPROTO OsbWood "https://raw.githubusercontent.com/cyberbotics/webots/master/projects/appearances/protos/OsbWood.proto"
 
 WorldInfo {
   info [

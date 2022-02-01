@@ -222,7 +222,7 @@ WbProtoModel *WbProtoList::customFindModel(const QString &modelName, const QStri
   while (it.hasNext()) {
     QFileInfo fi(it.next());
     tmpProto << fi;
-    printf("-- found %s\n", fi.fileName().toUtf8().constData());
+    // printf("-- found %s\n", fi.fileName().toUtf8().constData());
   }
 
   foreach (const QFileInfo &fi, tmpProto) {
@@ -378,7 +378,7 @@ QMap<QString, QString> WbProtoList::getExternProtoList(const QString &filename) 
 
         protoList.insert(identifier, url);  // if same identifier, only last url is kept
 
-        printf(" > found |%s| |%s|\n", identifier.toUtf8().constData(), url.toUtf8().constData());
+        // printf(" > found |%s| |%s|\n", identifier.toUtf8().constData(), url.toUtf8().constData());
       }
     }
   }
@@ -445,6 +445,7 @@ void WbProtoList::retrievalCompletionTracker() {
 }
 
 void WbProtoList::setupKnownProtoList() {
+  printf("-- known proto --\n");
   QDir searchPath("/home/daniel/webots_develop/projects/samples/devices/worlds");
 
   if (!searchPath.exists() || !searchPath.isReadable())
@@ -455,15 +456,16 @@ void WbProtoList::setupKnownProtoList() {
   worlds.append(searchPath.entryInfoList(filter, QDir::Files, QDir::Name));
 
   foreach (const QFileInfo &world, worlds) {
-    // printf("~~> %s\n", world.fileName().toUtf8().constData());
-    QMap<QString, QString> externProtos = getExternProtoList(world.fileName());
+    // printf("~~> %s\n", world.absoluteFilePath().toUtf8().constData());
+    QMap<QString, QString> externProtos = getExternProtoList(world.absoluteFilePath());
     mProtoList.insert(externProtos);
 
     QMapIterator<QString, QString> it(externProtos);
     while (it.hasNext()) {
       it.next();
 
-      printf("%30s %s\n", it.key().toUtf8().constData(), it.value().toUtf8().constData());
+      printf("  %30s %s\n", it.key().toUtf8().constData(), it.value().toUtf8().constData());
     }
   }
+  printf("-- end known proto --\n");
 }
