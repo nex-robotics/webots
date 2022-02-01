@@ -6,6 +6,7 @@
 
 EXTERNPROTO SolidBox "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/objects/solids/protos/SolidBox.proto"
 EXTERNPROTO Floor "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO BrushedAluminium "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/appearances/protos/BrushedAluminium.proto"
 EXTERNPROTO Parquetry "https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/appearances/protos/Parquetry.proto"
 
 
