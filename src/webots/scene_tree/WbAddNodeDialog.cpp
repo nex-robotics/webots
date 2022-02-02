@@ -483,6 +483,9 @@ void WbAddNodeDialog::buildTree() {
   int nWProtosNodes = 0;
   // nWProtosNodes = addProtosFromDirectory(wprotosItem, WbStandardPaths::projectsPath(), mFindLineEdit->text(),
   //                                       QDir(WbStandardPaths::projectsPath()));
+  QMap<QString, QString> m = WbProtoList::current()->protoInProjectsList();
+  insertProtosInNodeDialog(wprotosItem, m);
+
   mTree->addTopLevelItem(nodesItem);
   if (mUsesItem)
     mTree->addTopLevelItem(mUsesItem);
@@ -569,6 +572,33 @@ int WbAddNodeDialog::addProtosFromDirectory(QTreeWidgetItem *parentItem, const Q
       nAddedNodes += nNodes;
   }
   return nAddedNodes;
+}
+
+void WbAddNodeDialog::insertProtosInNodeDialog(QTreeWidgetItem *parentItem, QMap<QString, QString> &protos) {
+  QMapIterator<QString, QString> it(protos);
+  while (it.hasNext()) {
+    it.next();
+    QString path = it.value();
+
+    QStringList splitPath =
+      path.replace("https://raw.githubusercontent.com/cyberbotics/webots/feature-add-externproto-support/projects/", "")
+        .split("/");
+    for (int i = 0; i < splitPath.size(); ++i) {  // skip webots://projects/
+      // printf("%s\n", splitPath[i].toUtf8().constData());
+      QTreeWidgetItem *newFolderItem = new QTreeWidgetItem(QStringList(splitPath[i]));
+      parentItem->addChild(newFolderItem);
+    }
+    break;
+
+    // newFolderItem = new QTreeWidgetItem();
+    // parentItem->addChild(newFolderItem);
+  }
+
+  // newFolderItem = new QTreeWidgetItem(QStringList(list[i]));
+  // parentItem->addChild(newFolderItem);
+
+  // const QStringList &protoFiles = dir.entryList(filter, QDir::Files, QDir::Name);
+  // nAddedNodes += addProtos(parentItem, protoFiles, dir.absolutePath(), regex, rootDirectory);
 }
 
 int WbAddNodeDialog::addProtos(QTreeWidgetItem *parentItem, const QStringList &protoList, const QString &dirPath,

@@ -89,6 +89,7 @@ private:
                              const QDir &rootDirectory, bool recurse = true, bool inProtos = false);
   int addProtos(QTreeWidgetItem *parentItem, const QStringList &protoList, const QString &dirPath, const QString &regex,
                 const QDir &rootDirectory);
+  void insertProtosInNodeDialog(QTreeWidgetItem *parentItem, QMap<QString, QString> &protos);
   void showNodeInfo(const QString &nodeFileName, NodeType nodeType, const QString &boundingObjectInfo = "");
   bool doFieldRestrictionsAllowNode(const QString &nodeName) const;
 };

@@ -462,7 +462,8 @@ void WbProtoList::setupKnownProtoList() {
     mProtoList.insert(externProtos);
   }
 
-  printf("-- known proto --\n");
+  printf("-- known proto %d --\n", mProtoList.size());
+  /*
 
   QMapIterator<QString, QString> it(mProtoList);
   while (it.hasNext()) {
@@ -470,6 +471,6 @@ void WbProtoList::setupKnownProtoList() {
 
     printf("  %30s %s\n", it.key().toUtf8().constData(), it.value().toUtf8().constData());
   }
-
+  */
   printf("-- end known proto --\n");
 }
