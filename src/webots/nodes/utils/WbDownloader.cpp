@@ -144,9 +144,16 @@ void WbDownloader::finished() {
       if (mNetworkReply) {
         file.write(mNetworkReply->readAll());
       } else {
-        QNetworkReply *reply = gUrlCache[mUrl];  // cached already
-        assert(reply != NULL);
-        file.write(reply->readAll());
+        // sanity check
+        QNetworkReply *reply = gUrlCache[mUrl];
+        assert(reply.isFinished());
+        QIODevice *device = WbNetwork::instance()->networkAccessManager()->cache()->data(mUrl);  // cached already
+        device->open(QIODevice::ReadOnly);
+        assert(device->isOpen());
+
+        QFileInfo fi(mDestination);
+        file.write(device->readAll());
+        device->close();
       }
       file.close();
     } else

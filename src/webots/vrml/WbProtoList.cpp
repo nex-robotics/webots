@@ -410,7 +410,7 @@ void WbProtoList::recursiveProtoRetrieval(const QString &filename, const QString
     QFileInfo protoFile(rootPath + it.key() + ".proto");
     QDir dir;
     dir.mkpath(protoFile.absolutePath());
-    printf(" > making dir %s\n", protoFile.absolutePath().toUtf8().constData());
+    // printf(" > making dir %s\n", protoFile.absolutePath().toUtf8().constData());
 
     // download
     printf(" > downloading: %s to %s\n", it.key().toUtf8().constData(), protoFile.absoluteFilePath().toUtf8().constData());
@@ -446,7 +446,7 @@ void WbProtoList::retrievalCompletionTracker() {
 }
 
 void WbProtoList::setupKnownProtoList() {
-  QDir searchPath("/home/nctrl/webots_develop/projects/samples/devices/worlds");
+  QDir searchPath("/home/daniel/webots_develop/projects/samples/devices/worlds");
 
   if (!searchPath.exists() || !searchPath.isReadable())
     printf("> ERROR: path doesn't exist\n");  // TODO: handle this case
