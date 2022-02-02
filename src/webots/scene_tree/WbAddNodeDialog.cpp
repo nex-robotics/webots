@@ -466,8 +466,8 @@ void WbAddNodeDialog::buildTree() {
   // add project PROTO
   if (lprotosItem) {
     mIsAddingLocalProtos = true;
-    addProtosFromDirectory(lprotosItem, WbProject::current()->path() + "/protos/", mFindLineEdit->text(),
-                           QDir(WbProject::current()->path() + "/protos/"));
+    // addProtosFromDirectory(lprotosItem, WbProject::current()->path() + "/protos/", mFindLineEdit->text(),
+    //                       QDir(WbProject::current()->path() + "/protos/"));
     mIsAddingLocalProtos = false;
   }
 
@@ -475,14 +475,14 @@ void WbAddNodeDialog::buildTree() {
   if (aprotosItem) {
     mIsAddingExtraProtos = true;
     const QString &extraProjectsPath = WbPreferences::instance()->value("General/extraProjectsPath").toString();
-    addProtosFromDirectory(aprotosItem, extraProjectsPath, mFindLineEdit->text(), QDir(extraProjectsPath));
+    // addProtosFromDirectory(aprotosItem, extraProjectsPath, mFindLineEdit->text(), QDir(extraProjectsPath));
     mIsAddingExtraProtos = false;
   }
 
   // add Webots PROTO
   int nWProtosNodes = 0;
-  nWProtosNodes = addProtosFromDirectory(wprotosItem, WbStandardPaths::projectsPath(), mFindLineEdit->text(),
-                                         QDir(WbStandardPaths::projectsPath()));
+  // nWProtosNodes = addProtosFromDirectory(wprotosItem, WbStandardPaths::projectsPath(), mFindLineEdit->text(),
+  //                                       QDir(WbStandardPaths::projectsPath()));
   mTree->addTopLevelItem(nodesItem);
   if (mUsesItem)
     mTree->addTopLevelItem(mUsesItem);

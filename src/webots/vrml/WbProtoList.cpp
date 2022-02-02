@@ -125,6 +125,7 @@ void WbProtoList::findProtosRecursively(const QString &dirPath, QFileInfoList &p
   }
 }
 
+/*
 void WbProtoList::updateResourcesProtoCache() {
   gResourcesProtoCache.clear();
   QFileInfoList protosInfo;
@@ -157,6 +158,7 @@ void WbProtoList::updatePrimaryProtoCache() {
   findProtosRecursively(mPrimarySearchPath, protosInfo, mPrimarySearchPath.endsWith("protos"));
   mPrimaryProtoCache << protosInfo;
 }
+*/
 
 WbProtoModel *WbProtoList::readModel(const QString &fileName, const QString &worldPath, QStringList baseTypeList) const {
   printf("WbProtoList::readModel(arg string)\n");
@@ -446,14 +448,12 @@ void WbProtoList::retrievalCompletionTracker() {
 }
 
 void WbProtoList::setupKnownProtoList() {
-  QDir searchPath("/home/daniel/webots_develop/projects/samples/devices/worlds");
-
-  if (!searchPath.exists() || !searchPath.isReadable())
-    printf("> ERROR: path doesn't exist\n");  // TODO: handle this case
+  const QString &searchPath = WbStandardPaths::projectsPath();
 
   QFileInfoList worlds;
-  QStringList filter("*.wbt");
-  worlds.append(searchPath.entryInfoList(filter, QDir::Files, QDir::Name));
+  QDirIterator dit(searchPath, QStringList() << "*.wbt", QDir::Files, QDirIterator::Subdirectories);
+  while (dit.hasNext())
+    worlds << dit.next();
 
   foreach (const QFileInfo &world, worlds) {
     // printf("~~> %s\n", world.absoluteFilePath().toUtf8().constData());
