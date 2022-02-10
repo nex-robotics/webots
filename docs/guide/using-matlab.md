@@ -34,11 +34,21 @@ Otherwise you can create the link at anytime afterwards with this shell command 
 $ sudo ln -s /usr/local/MATLAB/R2021b/bin/matlab /usr/local/bin/matlab
 ```
 
-Similarly, on macOS, if Webots is unable to find the "matlab" startup script then you should add a symlink in "/usr/bin":
+Similarly, on macOS, if Webots is unable to find the "matlab" startup script then you should add a symlink in "/usr/local/bin":
 
 ```sh
 $ sudo ln -s /Applications/MATLAB_R2021b.app/bin/matlab /usr/local/bin/matlab
 ```
+
+The above command is only helping in case Webots is launched from a terminal.
+MacOS has a different PATH for applications launched from the Finder.
+If Webots is still unable to find matlab when launching from the Finder, you should update the "launchctl" PATH too:
+
+```sh
+$ sudo launchctl config user path $PATH 
+```
+
+Reboot the system to apply changes.
 
 ### How to Run the Examples?
 
