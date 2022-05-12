@@ -53,11 +53,13 @@ export default class Parser {
   }
 
   parse(text, renderer, parent, callback) {
+    console.log("Parsing...");
     let xml = null;
     if (window.DOMParser) {
       const parser = new DOMParser();
       xml = parser.parseFromString(text, 'text/xml');
     }
+    console.log(xml);
 
     if (typeof xml === 'undefined')
       console.error('File to parse not found');

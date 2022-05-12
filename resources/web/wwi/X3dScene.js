@@ -101,6 +101,7 @@ export default class X3dScene {
   }
 
   loadWorldFile(url, onLoad) {
+    console.log("Loading World");
     const prefix = this.prefix;
     const renderer = this.renderer;
     const xmlhttp = new XMLHttpRequest();
