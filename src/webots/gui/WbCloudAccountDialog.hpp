@@ -29,6 +29,10 @@ class QDialogButtonBox;
 class WbCloudAccountDialog : public QDialog {
   Q_OBJECT
 
+private slots:
+  void signUp();
+  void logIn();
+
 public:
   explicit WbCloudAccountDialog(QWidget *parent = NULL);
   virtual ~WbCloudAccountDialog() {}

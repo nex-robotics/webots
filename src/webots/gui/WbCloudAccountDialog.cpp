@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "WbCloudAccountDialog.hpp"
+#include "WbMessageBox.hpp"
 
 #include "WbLineEdit.hpp"
 
@@ -70,6 +71,7 @@ WbCloudAccountDialog::WbCloudAccountDialog(QWidget *parent) : QDialog(parent) {
   logInButton->setFixedWidth(emailLabel->width());
   // connect(logInButton, &QPushButton::pressed, this, &WbCloudAccountDialog::logIn);
   layout->addWidget(logInButton, 4, 1);
+  connect(logInButton, &QPushButton::pressed, this, &WbCloudAccountDialog::logIn);
 
   // sign up
   layout = new QGridLayout(signUp);
@@ -85,6 +87,7 @@ WbCloudAccountDialog::WbCloudAccountDialog(QWidget *parent) : QDialog(parent) {
   signUpButton->setFixedWidth(emailLabel->width());
   // connect(signUpButton, &QPushButton::pressed, this, &WbCloudAccountDialog::signUp);
   layout->addWidget(signUpButton, 2, 1);
+  connect(signUpButton, &QPushButton::pressed, this, &WbCloudAccountDialog::signUp);
 
   mButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
 
@@ -93,3 +96,12 @@ WbCloudAccountDialog::WbCloudAccountDialog(QWidget *parent) : QDialog(parent) {
   mainLayout->addWidget(mButtonBox);
 }
 
+void WbCloudAccountDialog::signUp() {
+  //if (WbCloudAccount::instance()->value("Account/email").toString())
+  WbMessageBox::info(tr("Signing up..."), this);
+}
+
+void WbCloudAccountDialog::logIn() {
+  //if (WbCloudAccount::instance()->value("Account/email").toString())
+  WbMessageBox::info(tr("Logging in..."), this);
+}
