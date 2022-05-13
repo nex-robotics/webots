@@ -106,7 +106,7 @@ WbCloudAccountWindow::WbCloudAccountWindow(QWidget *parent) : QDialog(parent) {
   layout->addWidget(checkBoxDoNotRemind, 5, 1, 1, 2);
 
   WbMainWindow *mainWindow = dynamic_cast<WbMainWindow *>(parentWidget());
-  connect(pushButtonLogin, &QPushButton::pressed, mainWindow, &WbMainWindow::openCloudAccountPreferencesDialog);
+  connect(pushButtonLogin, &QPushButton::pressed, mainWindow, &WbMainWindow::openCloudAccountDialog);
   connect(pushButtonLogin, &QPushButton::pressed, this, &WbShareWindow::close);
 }
 

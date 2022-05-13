@@ -89,7 +89,7 @@ public slots:
   void CheckBoxStatus(bool status) { mSaveCheckboxStatus = status; };
   void uploadScene();
   void startAnimationRecording();
-  void openCloudAccountPreferencesDialog();
+  void openCloudAccountDialog();
 
 protected:
   bool event(QEvent *event) override;

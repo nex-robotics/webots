@@ -62,7 +62,6 @@ WbPreferencesDialog::WbPreferencesDialog(QWidget *parent, const QString &default
   mTabWidget->addTab(createGeneralTab(), tr("General"));
   mTabWidget->addTab(createOpenGLTab(), tr("OpenGL"));
   mTabWidget->addTab(createNetworkTab(), tr("Network"));
-  mTabWidget->addTab(createCloudAccountTab(), tr("webots.cloud"));
 
   for (int i = 0; i < mTabWidget->count(); ++i) {
     if (mTabWidget->tabText(i) == defaultTab) {
@@ -515,63 +514,6 @@ QWidget *WbPreferencesDialog::createNetworkTab() {
     new QLabel(tr("Amount of cache used: %1 MB.").arg(WbNetwork::instance()->cacheSize() / (1024 * 1024)), this);
   layout->addWidget(mCacheSizeLabel, 1, 0);
   layout->addWidget(clearCacheButton, 1, 1);
-
-  return widget;
-}
-
-QWidget *WbPreferencesDialog::createCloudAccountTab() {
-  QWidget *widget = new QWidget(this);
-  widget->setContentsMargins(0, 0, 0, 200);
-  QGridLayout *cloudAccount = new QGridLayout(widget);
-  QGroupBox *logIn = new QGroupBox(tr("Log in"), this);
-  logIn->setObjectName("networkGroupBox");
-  QGroupBox *signUp = new QGroupBox(tr("Sign up"), this);
-  signUp->setObjectName("networkGroupBox");
-
-  cloudAccount->addWidget(logIn, 0, 1);
-  cloudAccount->addWidget(signUp, 1, 1);
-
-  // log in
-  QGridLayout *layout = new QGridLayout(logIn);
-
-  // row 0
-  mEmail = new WbLineEdit(this);
-  mEmail->setText(WbPreferences::instance()->value("Account/email").toString());
-  layout->addWidget(new QLabel(tr("E-mail:"), this), 1, 0);
-  layout->addWidget(mEmail, 1, 1);
-
-  // row 1
-  mPassword = new WbLineEdit(this);
-  mPassword->setText(WbPreferences::instance()->value("Account/password").toString());
-  mPassword->setEchoMode(QLineEdit::PasswordEchoOnEdit);
-  layout->addWidget(new QLabel(tr("Password:"), this), 2, 0);
-  layout->addWidget(mPassword, 2, 1);
-
-  // row 2
-  mRememberAccount = new QCheckBox(tr("Remember me"), this);
-  mRememberAccount->setChecked(false);
-  layout->addWidget(mRememberAccount, 3, 1);
-
-  // row 2
-  QPushButton *logInButton = new QPushButton(QString("Log in"), this);
-  logInButton->setFixedWidth(mPassword->width());
-  // connect(logInButton, &QPushButton::pressed, this, &WbPreferencesDialog::logIn);
-  layout->addWidget(logInButton, 4, 1);
-
-  // Cache
-  layout = new QGridLayout(signUp);
-
-  // row 0
-  mEmail = new WbLineEdit(this);
-  mEmail->setFixedWidth(mPassword->width());
-  layout->addWidget(new QLabel(tr("E-mail:"), this), 1, 0);
-  layout->addWidget(mEmail, 1, 1);
-
-  // row 2
-  QPushButton *signUpButton = new QPushButton(QString("Sign up"), this);
-  signUpButton->setFixedWidth(logInButton->width());
-  // connect(signUpButton, &QPushButton::pressed, this, &WbPreferencesDialog::signUp);
-  layout->addWidget(signUpButton, 2, 1);
 
   return widget;
 }

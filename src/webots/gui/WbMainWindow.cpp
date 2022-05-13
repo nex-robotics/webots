@@ -21,6 +21,7 @@
 #include "WbApplicationInfo.hpp"
 #include "WbBuildEditor.hpp"
 #include "WbClipboard.hpp"
+#include "WbCloudAccountDialog.hpp"
 #include "WbConsole.hpp"
 #include "WbContextMenuGenerator.hpp"
 #include "WbControlledWorld.hpp"
@@ -758,6 +759,12 @@ QMenu *WbMainWindow::createToolsMenu() {
   action->setText(tr("&Preferences..."));
   action->setStatusTip(tr("Open the Preferences window."));
   connect(action, &QAction::triggered, this, &WbMainWindow::openPreferencesDialog);
+  menu->addAction(action);
+
+  action = new QAction(this);
+  action->setText(tr("Webots.cloud &Account"));
+  action->setStatusTip(tr("Sign up, log in or log out of webots.cloud."));
+  connect(action, &QAction::triggered, this, &WbMainWindow::openCloudAccountDialog);
   menu->addAction(action);
 
   return menu;
@@ -1556,8 +1563,6 @@ void WbMainWindow::ShareMenu() {
 
 void WbMainWindow::CloudAccountMenu() {
   const WbSimulationState::Mode currentMode = WbSimulationState::instance()->mode();
-  //WbPreferencesDialog WbPreferencesDialog(this, "webots.cloud");
-  //WbPreferencesDialog.exec();
   WbCloudAccountWindow cloudAccountWindow(this);
   cloudAccountWindow.exec();
   WbSimulationState::instance()->setMode(currentMode);
@@ -1983,8 +1988,8 @@ void WbMainWindow::openPreferencesDialog() {
   dialog.exec();
 }
 
-void WbMainWindow::openCloudAccountPreferencesDialog() {
-  WbPreferencesDialog dialog(this, "webots.cloud");
+void WbMainWindow::openCloudAccountDialog() {
+  WbCloudAccountDialog dialog(this);
   dialog.exec();
 }
 
