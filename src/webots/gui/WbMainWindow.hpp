@@ -89,6 +89,7 @@ public slots:
   void CheckBoxStatus(bool status) { mSaveCheckboxStatus = status; };
   void uploadScene();
   void startAnimationRecording();
+  void openCloudAccountPreferencesDialog();
 
 protected:
   bool event(QEvent *event) override;
@@ -148,6 +149,7 @@ private slots:
   void disableAnimationAction();
 
   void ShareMenu();
+  void CloudAccountMenu();
   void upload(char type);
   void updateUploadProgressBar(qint64 bytesSent, qint64 bytesTotal);
   void uploadFinished();

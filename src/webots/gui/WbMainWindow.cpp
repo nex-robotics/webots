@@ -1547,9 +1547,19 @@ QString WbMainWindow::exportHtmlFiles() {
 }
 
 void WbMainWindow::ShareMenu() {
+  CloudAccountMenu();
   const WbSimulationState::Mode currentMode = WbSimulationState::instance()->mode();
   WbShareWindow shareWindow(this);
   shareWindow.exec();
+  WbSimulationState::instance()->setMode(currentMode);
+}
+
+void WbMainWindow::CloudAccountMenu() {
+  const WbSimulationState::Mode currentMode = WbSimulationState::instance()->mode();
+  //WbPreferencesDialog WbPreferencesDialog(this, "webots.cloud");
+  //WbPreferencesDialog.exec();
+  WbCloudAccountWindow cloudAccountWindow(this);
+  cloudAccountWindow.exec();
   WbSimulationState::instance()->setMode(currentMode);
 }
 
@@ -1970,6 +1980,11 @@ void WbMainWindow::newProto() {
 void WbMainWindow::openPreferencesDialog() {
   WbPreferencesDialog dialog(this);
   connect(&dialog, &WbPreferencesDialog::restartRequested, this, &WbMainWindow::restartRequested);
+  dialog.exec();
+}
+
+void WbMainWindow::openCloudAccountPreferencesDialog() {
+  WbPreferencesDialog dialog(this, "webots.cloud");
   dialog.exec();
 }
 

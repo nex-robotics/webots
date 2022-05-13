@@ -19,6 +19,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QDialogButtonBox>
 
 #include "WbMainWindow.hpp"
 #include "WbPreferences.hpp"
@@ -71,6 +72,42 @@ WbShareWindow::WbShareWindow(QWidget *parent) : QDialog(parent) {
   connect(pushButtonScene, &QPushButton::pressed, this, &WbShareWindow::close);
   connect(pushButtonAnimation, &QPushButton::pressed, mainWindow, &WbMainWindow::startAnimationRecording);
   connect(pushButtonAnimation, &QPushButton::pressed, this, &WbShareWindow::close);
+}
+
+WbCloudAccountWindow::WbCloudAccountWindow(QWidget *parent) : QDialog(parent) {
+  QString uploadUrl = WbPreferences::instance()->value("Network/uploadUrl").toString();
+  if (uploadUrl.contains("//"))
+    uploadUrl = uploadUrl.split("//")[1];
+
+  this->setWindowTitle(tr("Log in or Sign up to webots.cloud"));
+
+  QGridLayout *layout = new QGridLayout(this);
+
+  QLabel *labelIntro = new QLabel(this);
+  labelIntro->setOpenExternalLinks(true);
+  labelIntro->setText(tr("<html><head/><body><p>You do not appear to be signed in to <a href=\"https://%1/\"><span "
+                         "style=\" text-decoration: underline; color:#5dade2;\">%1</span></a>.</p></body></html>")
+                         .arg(uploadUrl));
+  layout->addWidget(labelIntro, 3, 0, 1, 3);
+
+  QSpacerItem *verticalSpacer = new QSpacerItem(100, 10);
+  layout->addItem(verticalSpacer, 4, 0, 1, 3);
+
+  QPushButton *pushButtonLogin = new QPushButton(this);
+  pushButtonLogin->setFocusPolicy(Qt::NoFocus);
+  pushButtonLogin->setText(tr("Log in / Sign up"));
+  pushButtonLogin->setFixedHeight(pushButtonLogin->height() + 9);
+  layout->addWidget(pushButtonLogin, 5, 0, 1, 1);
+
+  QCheckBox *checkBoxDoNotRemind = new QCheckBox(this);
+  checkBoxDoNotRemind->setFocusPolicy(Qt::NoFocus);
+  checkBoxDoNotRemind->setText(tr("Don't remind me again."));
+  checkBoxDoNotRemind->setEnabled(false);
+  layout->addWidget(checkBoxDoNotRemind, 5, 1, 1, 2);
+
+  WbMainWindow *mainWindow = dynamic_cast<WbMainWindow *>(parentWidget());
+  connect(pushButtonLogin, &QPushButton::pressed, mainWindow, &WbMainWindow::openCloudAccountPreferencesDialog);
+  connect(pushButtonLogin, &QPushButton::pressed, this, &WbShareWindow::close);
 }
 
 WbLinkWindow::WbLinkWindow(QWidget *parent) : QDialog(parent) {

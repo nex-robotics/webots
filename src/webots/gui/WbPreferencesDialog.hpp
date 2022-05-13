@@ -65,9 +65,9 @@ private:
   QComboBox *mLanguageCombo, *mThemeCombo, *mStartupModeCombo, *mAmbientOcclusionCombo, *mTextureQualityCombo,
     *mTextureFilteringCombo;
   WbLineEdit *mEditorFontEdit, *mPythonCommand, *mMatlabCommand, *mExtraProjectPath, *mHttpProxyHostName, *mHttpProxyPort,
-    *mHttpProxyUsername, *mHttpProxyPassword, *mUploadUrl, *mBrowserProgram;
+    *mHttpProxyUsername, *mHttpProxyPassword, *mUploadUrl, *mBrowserProgram, *mEmail, *mPassword;
   QCheckBox *mDisableSaveWarningCheckBox, *mCheckWebotsUpdateCheckBox, *mTelemetryCheckBox, *mDisableShadowsCheckBox,
-    *mDisableAntiAliasingCheckBox, *mHttpProxySocks5CheckBox, *mRenderingCheckBox, *mNewBrowserWindow;
+    *mDisableAntiAliasingCheckBox, *mHttpProxySocks5CheckBox, *mRenderingCheckBox, *mNewBrowserWindow, *mRememberAccount;
   QSpinBox *mCacheSize;
   QLabel *mCacheSizeLabel;
 
@@ -76,6 +76,7 @@ private:
   QWidget *createGeneralTab();
   QWidget *createOpenGLTab();
   QWidget *createNetworkTab();
+  QWidget *createCloudAccountTab();
 };
 
 #endif

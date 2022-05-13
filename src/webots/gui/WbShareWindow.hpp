@@ -31,6 +31,13 @@ public:
   virtual ~WbShareWindow() {}
 };
 
+class WbCloudAccountWindow : public QDialog {
+  Q_OBJECT
+public:
+  explicit WbCloudAccountWindow(QWidget *parent = NULL);
+  virtual ~WbCloudAccountWindow() {}
+};
+
 class WbLinkWindow : public QDialog {
   Q_OBJECT
 public:
