@@ -65,9 +65,9 @@ private:
   QComboBox *mLanguageCombo, *mThemeCombo, *mStartupModeCombo, *mAmbientOcclusionCombo, *mTextureQualityCombo,
     *mTextureFilteringCombo;
   WbLineEdit *mEditorFontEdit, *mPythonCommand, *mMatlabCommand, *mExtraProjectPath, *mHttpProxyHostName, *mHttpProxyPort,
-    *mHttpProxyUsername, *mHttpProxyPassword, *mUploadUrl, *mBrowserProgram, *mEmail, *mPassword;
+    *mHttpProxyUsername, *mHttpProxyPassword, *mUploadUrl, *mBrowserProgram;
   QCheckBox *mDisableSaveWarningCheckBox, *mCheckWebotsUpdateCheckBox, *mTelemetryCheckBox, *mDisableShadowsCheckBox,
-    *mDisableAntiAliasingCheckBox, *mHttpProxySocks5CheckBox, *mRenderingCheckBox, *mNewBrowserWindow, *mRememberAccount;
+    *mDisableAntiAliasingCheckBox, *mHttpProxySocks5CheckBox, *mRenderingCheckBox, *mNewBrowserWindow;
   QSpinBox *mCacheSize;
   QLabel *mCacheSizeLabel;
 
